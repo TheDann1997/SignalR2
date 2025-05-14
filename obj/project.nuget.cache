@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "gOyo116cWN3Rhi7Rq9zTAKwu89qY6oBnY6vfuwY6QEFBYg7sS0IUO0uQy6w96U+zhTiNUnMtRrL+vy6kqFbN8Q==",
+  "dgSpecHash": "4u/mIXV+Tgch2druZWtVcb1jSBFlZ305bEAuW3n86/hnzFZf818rpxBoaD9xMY2xB45gb24sj2N3QpO8ks51Jg==",
   "success": true,
-  "projectFilePath": "D:\\vsdc\\Chat\\SignalR\\SignalR.csproj",
+  "projectFilePath": "D:\\vsdc\\Chat\\Signal\\SignalR.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\agudelod\\.nuget\\packages\\microsoft.aspnetcore.authentication.abstractions\\2.3.0\\microsoft.aspnetcore.authentication.abstractions.2.3.0.nupkg.sha512",
     "C:\\Users\\agudelod\\.nuget\\packages\\microsoft.aspnetcore.authorization\\2.3.0\\microsoft.aspnetcore.authorization.2.3.0.nupkg.sha512",

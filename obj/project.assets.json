@@ -1920,11 +1920,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\vsdc\\Chat\\SignalR\\SignalR.csproj",
+      "projectUniqueName": "D:\\vsdc\\Chat\\Signal\\SignalR.csproj",
       "projectName": "SignalR",
-      "projectPath": "D:\\vsdc\\Chat\\SignalR\\SignalR.csproj",
+      "projectPath": "D:\\vsdc\\Chat\\Signal\\SignalR.csproj",
       "packagesPath": "C:\\Users\\agudelod\\.nuget\\packages\\",
-      "outputPath": "D:\\vsdc\\Chat\\SignalR\\obj\\",
+      "outputPath": "D:\\vsdc\\Chat\\Signal\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\agudelod\\AppData\\Roaming\\NuGet\\NuGet.Config",
