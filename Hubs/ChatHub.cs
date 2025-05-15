@@ -166,6 +166,22 @@ namespace SignalR.Hubs
                 .SendAsync("RecibirAudioEnVivo", remitenteId, audioData);
         }
 
+        public async Task NotificarVideollamadaEntrante(string destinatarioId, string remitenteId, string remitenteNombre)
+        {
+            await Clients.Group($"user_{destinatarioId}")
+                .SendAsync("VideollamadaEntrante", remitenteId, remitenteNombre);
+        }
+        public async Task AceptarVideollamada(string remitenteId, string destinatarioNombre)
+        {
+            await Clients.Group($"user_{remitenteId}")
+                .SendAsync("VideollamadaAceptada", destinatarioNombre);
+        }
+
+        public async Task RechazarVideollamada(string remitenteId, string destinatarioNombre)
+        {
+            await Clients.Group($"user_{remitenteId}")
+                .SendAsync("VideollamadaRechazada", destinatarioNombre);
+        }
 
     }
 }
