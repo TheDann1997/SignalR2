@@ -151,13 +151,13 @@ namespace SignalR.Hubs
         public async Task NotificarLlamadaEntrante(string destinatarioId, string remitenteId, string remitenteNombre)
         {
             await Clients.Group($"user_{destinatarioId}")
-                .SendAsync("LlamadaEntrante", remitenteId, remitenteNombre, destinatarioId);
+                .SendAsync("LlamadaEntrante", remitenteId, remitenteNombre);
         }
 
         public async Task AceptarLlamada(string remitenteId, string destinatarioId, string remitenteNombre)
         {
             await Clients.Group($"user_{remitenteId}")
-                .SendAsync("LlamadaAceptada", destinatarioId, remitenteNombre,  remitenteId);
+                .SendAsync("LlamadaAceptada", destinatarioId, remitenteNombre);
         }
 
         public async Task TransmitirAudioEnVivo(string destinatarioId, string remitenteId, byte[] audioData)
@@ -166,10 +166,6 @@ namespace SignalR.Hubs
                 .SendAsync("RecibirAudioEnVivo", remitenteId, audioData);
         }
 
-        public async Task ColgarLlamada(string remitenteId, string destinatarioId)
-        {
-            await Clients.Group($"user_{destinatarioId}")
-                .SendAsync("LlamadaColgada", remitenteId);
-        }
+
     }
 }
