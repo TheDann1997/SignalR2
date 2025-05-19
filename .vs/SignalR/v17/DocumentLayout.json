@@ -3,12 +3,15 @@
   "WorkspaceRootPath": "D:\\vsdc\\Chat\\Signal\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|d:\\vsdc\\chat\\signal\\hubs\\chathub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:hubs\\chathub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|d:\\vsdc\\chat\\signal\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|d:\\vsdc\\chat\\signal\\hubs\\chathub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:hubs\\chathub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\vsdc\\Chat\\WpfAapp\\Views\\Dashboard.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,30 +21,43 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
+              "Title": "Dashboard.xaml.cs",
+              "DocumentMoniker": "D:\\vsdc\\Chat\\WpfAapp\\Views\\Dashboard.xaml.cs",
+              "RelativeDocumentMoniker": "..\\WpfAapp\\Views\\Dashboard.xaml.cs",
+              "ToolTip": "D:\\vsdc\\Chat\\WpfAapp\\Views\\Dashboard.xaml.cs",
+              "RelativeToolTip": "..\\WpfAapp\\Views\\Dashboard.xaml.cs",
+              "ViewState": "AQIAAEUAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-19T20:05:12.274Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\vsdc\\Chat\\Signal\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "D:\\vsdc\\Chat\\Signal\\Program.cs*",
-              "RelativeToolTip": "Program.cs*",
-              "ViewState": "AQIAAAwAAAAAAAAAAAAwwDMAAAAKAAAA",
+              "ToolTip": "D:\\vsdc\\Chat\\Signal\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AQIAAAwAAAAAAAAAAAAwwDEAAAAqAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-19T17:12:54.544Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "ChatHub.cs",
               "DocumentMoniker": "D:\\vsdc\\Chat\\Signal\\Hubs\\ChatHub.cs",
               "RelativeDocumentMoniker": "Hubs\\ChatHub.cs",
               "ToolTip": "D:\\vsdc\\Chat\\Signal\\Hubs\\ChatHub.cs",
               "RelativeToolTip": "Hubs\\ChatHub.cs",
-              "ViewState": "AQIAADUAAAAAAAAAAAAAAEsAAACBAAAA",
+              "ViewState": "AQIAAKsAAAAAAAAAAAAAAMIAAAAJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-15T15:19:05.117Z",
               "EditorCaption": ""

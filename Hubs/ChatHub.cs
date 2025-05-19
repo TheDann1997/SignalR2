@@ -187,11 +187,11 @@ namespace SignalR.Hubs
         }
 
 
-
         public async Task EnviarOferta(string destinatarioId, string oferta)
         {
+            string emisorId = Context.UserIdentifier;
             await Clients.Group($"user_{destinatarioId}")
-                .SendAsync("RecibirOferta", oferta);
+                .SendAsync("RecibirOferta", oferta, emisorId);
         }
 
         public async Task EnviarRespuesta(string destinatarioId, string respuesta)
@@ -205,7 +205,6 @@ namespace SignalR.Hubs
             await Clients.Group($"user_{destinatarioId}")
                 .SendAsync("RecibirIceCandidate", candidato);
         }
-
 
         //opcionale para ams adekante
 
