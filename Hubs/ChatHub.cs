@@ -9,15 +9,15 @@ namespace SignalR.Hubs
         public async Task EnviarMensajePrivado(string destinatarioId, string remitente, string mensaje)
         {
 
-      
+
             // Envia solo al grupo del destinatario
             await Clients.Group($"user_{destinatarioId}")
                          .SendAsync("RecibirMensaje", remitente, mensaje);
-           // await Clients.All.SendAsync("ActualizarContadorMensajes");
+            // await Clients.All.SendAsync("ActualizarContadorMensajes");
         }
         public async Task EnviarGifPrivado(string destinatarioId, string remitenteId, string gifUrl)
         {
-   
+
             if (string.IsNullOrEmpty(destinatarioId) || string.IsNullOrEmpty(remitenteId) || string.IsNullOrEmpty(gifUrl))
                 return;
 
@@ -38,7 +38,7 @@ namespace SignalR.Hubs
             if (string.IsNullOrEmpty(destinatarioId) || string.IsNullOrEmpty(remitenteNombre) || audioData == null || audioData.Length == 0)
                 return;
 
-           // await Clients.User(destinatarioId).SendAsync("RecibirAudioPrivado", remitenteNombre, audioData);
+            // await Clients.User(destinatarioId).SendAsync("RecibirAudioPrivado", remitenteNombre, audioData);
 
             await Clients.Group($"user_{destinatarioId}")
              .SendAsync("RecibirAudioPrivado", remitenteNombre, audioData);
@@ -51,7 +51,7 @@ namespace SignalR.Hubs
             if (string.IsNullOrEmpty(destinatarioId) || archivoBytes == null || archivoBytes.Length == 0)
                 return;
 
-           // await Clients.User(destinatarioId).SendAsync("RecibirArchivoPrivado", remitenteNombre, archivoBytes, nombreArchivo);
+            // await Clients.User(destinatarioId).SendAsync("RecibirArchivoPrivado", remitenteNombre, archivoBytes, nombreArchivo);
             await Clients.Group($"user_{destinatarioId}")
              .SendAsync("RecibirArchivoPrivado", remitenteNombre, archivoBytes, nombreArchivo);
 
@@ -168,20 +168,62 @@ namespace SignalR.Hubs
 
         public async Task NotificarVideollamadaEntrante(string destinatarioId, string remitenteId, string remitenteNombre)
         {
+            // Validar que el destinatario esté conectado y en el grupo
             await Clients.Group($"user_{destinatarioId}")
                 .SendAsync("VideollamadaEntrante", remitenteId, remitenteNombre);
         }
+
         public async Task AceptarVideollamada(string remitenteId, string destinatarioNombre)
         {
             await Clients.Group($"user_{remitenteId}")
                 .SendAsync("VideollamadaAceptada", destinatarioNombre);
         }
 
+
         public async Task RechazarVideollamada(string remitenteId, string destinatarioNombre)
         {
             await Clients.Group($"user_{remitenteId}")
                 .SendAsync("VideollamadaRechazada", destinatarioNombre);
         }
+
+
+
+        public async Task EnviarOferta(string destinatarioId, string oferta)
+        {
+            await Clients.Group($"user_{destinatarioId}")
+                .SendAsync("RecibirOferta", oferta);
+        }
+
+        public async Task EnviarRespuesta(string destinatarioId, string respuesta)
+        {
+            await Clients.Group($"user_{destinatarioId}")
+                .SendAsync("RecibirRespuesta", respuesta);
+        }
+
+        public async Task EnviarIceCandidate(string destinatarioId, string candidato)
+        {
+            await Clients.Group($"user_{destinatarioId}")
+                .SendAsync("RecibirIceCandidate", candidato);
+        }
+
+
+        //opcionale para ams adekante
+
+        public async Task ConfirmarMensajeRecibido(string remitenteId, string destinatarioId, string mensajeId)
+        {
+            await Clients.Group($"user_{remitenteId}").SendAsync("MensajeRecibido", destinatarioId, mensajeId);
+        }
+        public async Task ConfirmarMensajeLeido(string remitenteId, string destinatarioId, string mensajeId)
+        {
+            await Clients.Group($"user_{remitenteId}").SendAsync("MensajeLeido", destinatarioId, mensajeId);
+        }
+        public async Task ColgarLlamada(string destinatarioId, string remitenteId)
+        {
+            await Clients.Group($"user_{destinatarioId}")
+                .SendAsync("LlamadaColgada", remitenteId);
+        }
+
+
 
     }
 }

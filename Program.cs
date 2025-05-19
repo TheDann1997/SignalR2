@@ -7,15 +7,29 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSignalR(); // ?? SignalR agregado
+
+// SignalR
 builder.Services.AddSignalR(options =>
 {
-    options.MaximumReceiveMessageSize = 200 * 1024 * 1024; // 200 MB para archivos grandes
+    options.MaximumReceiveMessageSize = 200 * 1024 * 1024; // 200 MB
 });
 
-// Aquí registrás el CustomUserIdProvider
+// CORS: Permite cualquier origen (útil para desarrollo)
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials() // <- Necesario para SignalR
+            .SetIsOriginAllowed(_ => true); // <- Permite cualquier origen
+    });
+});
+
+// CustomUserIdProvider, solo pon una vez la línea correcta:
 builder.Services.AddSingleton<IUserIdProvider, SignalR.Hubs.CustomUserIdProvider>();
-builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -25,13 +39,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); // Puedes comentar esto si solo usas HTTP
+
+app.UseCors(); // <--- ¡IMPORTANTE! Antes de Authorization y antes del Hub
 
 app.UseAuthorization();
 
 app.MapControllers();
 
-// ? Agrega esta línea para que el Hub esté disponible
 app.MapHub<SignalR.Hubs.ChatHub>("/chathub");
 
 app.Run();
