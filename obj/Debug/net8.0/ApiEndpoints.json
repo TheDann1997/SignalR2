@@ -1,5 +1,21 @@
 [
   {
+    "ContainingType": "SignalR.Controllers.ArchivosController",
+    "Method": "Subir",
+    "RelativePath": "api/Archivos/Subir",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Archivo",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "SignalR.Controllers.WeatherForecastController",
     "Method": "Get",
     "RelativePath": "WeatherForecast",
@@ -17,6 +33,7 @@
         ],
         "StatusCode": 200
       }
-    ]
+    ],
+    "EndpointName": "GetWeatherForecast"
   }
 ]

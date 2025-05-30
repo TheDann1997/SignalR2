@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.FileProviders;
 using SignalR.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +16,17 @@ builder.Services.AddSignalR(options =>
     options.MaximumReceiveMessageSize = 200 * 1024 * 1024; // 200 MB
 });
 
+// Aumentar límite de tamaño para archivos grandes
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 200 * 1024 * 1024; // 200 MB
+});
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Limits.MaxRequestBodySize = 200 * 1024 * 1024; // 200 MB
+});
+
 // CORS: Permite cualquier origen (útil para desarrollo)
 builder.Services.AddCors(options =>
 {
@@ -22,12 +35,12 @@ builder.Services.AddCors(options =>
         policy
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials() // <- Necesario para SignalR
-            .SetIsOriginAllowed(_ => true); // <- Permite cualquier origen
+            .AllowCredentials()
+            .SetIsOriginAllowed(_ => true);
     });
 });
 
-// CustomUserIdProvider, solo pon una vez la línea correcta:
+// CustomUserIdProvider
 builder.Services.AddSingleton<IUserIdProvider, SignalR.Hubs.CustomUserIdProvider>();
 
 var app = builder.Build();
@@ -39,9 +52,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// app.UseHttpsRedirection(); // Puedes comentar esto si solo usas HTTP
+// app.UseHttpsRedirection();
 
-app.UseCors(); // <--- ¡IMPORTANTE! Antes de Authorization y antes del Hub
+app.UseCors();
 
 app.UseAuthorization();
 
@@ -49,9 +62,19 @@ app.MapControllers();
 
 app.MapHub<SignalR.Hubs.ChatHub>("/chathub");
 
+app.UseStaticFiles();
+
+// Para la carpeta "uploads":
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "uploads")),
+    RequestPath = "/uploads"
+});
+
 app.Run();
 
-
+ 
 //using Microsoft.AspNetCore.SignalR;
 //using SignalR.Hubs;
 //
