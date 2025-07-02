@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using SignalR.Data;
+using SignalR.Models;
 using System;
 using System.Threading.Tasks;
 
@@ -6,15 +8,144 @@ namespace SignalR.Hubs
 {
     public class ChatHub : Hub
     {
-        public async Task EnviarMensajePrivado(string destinatarioId, string remitente, string mensaje)
+
+        //REFACTORIZADO
+        private readonly AppDbContext _context;
+
+        public ChatHub(AppDbContext context)
+        {
+            _context = context;
+        }
+        public async Task EnviarMensaje(string destinatarioId, Mensaje mensaje)
+        {
+            if (mensaje.EsGrupal)
+            {
+                //Console.WriteLine($"llego un mensaje para el grupo con ID {destinatarioId}");
+                await Clients.OthersInGroup($"grupo_{destinatarioId}")
+                      .SendAsync("RecibirMensaje", mensaje);
+            }
+            else
+            {
+                Console.WriteLine($"llego un mensaje para el usuario con ID {destinatarioId}");
+                await Clients.Group($"user_{destinatarioId}")
+                      .SendAsync("RecibirMensaje", mensaje);
+            }
+        }
+        public async Task EnviarReaccion(string nombreRemitente, string reaccion, string destinatarioId, string mensajeIdReaccion)
+        {
+           
+
+            //Console.WriteLine($"llego una reaccion para el usuario con ID {destinatarioId}");
+            await Clients.Group($"user_{destinatarioId}")
+              .SendAsync("RecibirNotificaiondeReaccion", nombreRemitente, reaccion, mensajeIdReaccion);
+        }
+        public async Task EnviarMensajeConRespuesta(Mensaje mensajerespondido, string NombreDelRemitente)
+        {
+            if (mensajerespondido.EsGrupal)
+            {
+               // await Clients.OthersInGroup($"grupo_{mensajerespondido.GrupoId}")
+         // .SendAsync("RecibirMensajeConRespuesta", mensajerespondido);
+            }
+            else
+            {
+                await Clients.Group($"user_{mensajerespondido.DestinatarioId}")
+               .SendAsync("RecibirMensajeConRespuesta", mensajerespondido, NombreDelRemitente);
+            }
+
+            //Console.WriteLine($"llego una reaccion para el usuario con ID {destinatarioId}");
+           
+        }
+        public async Task EnviarEscribiendoMensaje(string destinatarioId,string myID, string MyAvatar)
         {
 
 
-            // Envia solo al grupo del destinatario
-            await Clients.Group($"user_{destinatarioId}")
-                         .SendAsync("RecibirMensaje", remitente, mensaje);
-            // await Clients.All.SendAsync("ActualizarContadorMensajes");
+            Console.WriteLine($"escribiendo en signalR para {destinatarioId}");
+           await Clients.Group($"user_{destinatarioId}")
+             .SendAsync("RecibirEscribiendo", destinatarioId, myID, MyAvatar);
         }
+
+
+
+
+
+
+
+
+        public async Task EnviarMensajeGrupo(string grupoId, Mensaje mensaje)
+        {
+
+            Console.WriteLine($"llego un mensaje para el grupo con ID {grupoId}");
+            await Clients.Group($"grupo_{grupoId}")
+                         .SendAsync("RecibirMensaje", mensaje);
+        }
+
+        public override async Task OnConnectedAsync()
+        {
+            // Obtener userId desde la query string
+            var httpContext = Context.GetHttpContext();
+            var userIdString = httpContext.Request.Query["userId"];
+
+            if (int.TryParse(userIdString, out int userId))
+            {
+                // 👉 Unirse a grupo individual para mensajes directos
+                await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{userId}");
+                Console.WriteLine($"Usuario {userId} conectado a grupo individual user_{userId}");
+
+                // 👉 Buscar grupos en la base de datos
+                var grupos = _context.UsuariosGrupos
+                    .Where(ug => ug.UsuarioId == userId)
+                    .Select(ug => ug.GrupoId)
+                    .ToList();
+
+                foreach (var grupoId in grupos)
+                {
+                    string nombreGrupo = $"grupo_{grupoId}";
+                    await Groups.AddToGroupAsync(Context.ConnectionId, nombreGrupo);
+                    Console.WriteLine($"Usuario {userId} unido a grupo {nombreGrupo}");
+                }
+            }
+
+            await base.OnConnectedAsync();
+        }
+
+        public override async Task OnDisconnectedAsync(Exception exception)
+        {
+            var httpContext = Context.GetHttpContext();
+            var userIdString = httpContext.Request.Query["userId"];
+
+            if (int.TryParse(userIdString, out int userId))
+            {
+                // 🔸 Remover del grupo individual
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"user_{userId}");
+                Console.WriteLine($"Usuario {userId} desconectado del grupo individual user_{userId}");
+
+                // 🔸 Obtener grupos grupales desde la base de datos
+                var grupos = _context.UsuariosGrupos
+                    .Where(ug => ug.UsuarioId == userId)
+                    .Select(ug => ug.GrupoId)
+                    .ToList();
+
+                foreach (var grupoId in grupos)
+                {
+                    string nombreGrupo = $"grupo_{grupoId}";
+                    await Groups.RemoveFromGroupAsync(Context.ConnectionId, nombreGrupo);
+                    Console.WriteLine($"Usuario {userId} removido de grupo {nombreGrupo}");
+                }
+            }
+
+            await base.OnDisconnectedAsync(exception);
+        }
+
+
+        //  public async Task EnviarMensajePrivado(string destinatarioId, string remitente, string mensaje)
+        //  {
+        //
+        //
+        //      // Envia solo al grupo del destinatario
+        //      await Clients.Group($"user_{destinatarioId}")
+        //                   .SendAsync("RecibirMensaje", remitente, mensaje);
+        //      // await Clients.All.SendAsync("ActualizarContadorMensajes");
+        //  }
         public async Task EnviarGifPrivado(string destinatarioId, string remitenteId, string gifUrl)
         {
 
@@ -119,33 +250,41 @@ namespace SignalR.Hubs
 
 
 
-        public override async Task OnConnectedAsync()
-        {
-            var httpContext = Context.GetHttpContext();
-            var userId = httpContext.Request.Query["userId"];
+      // public override async Task OnConnectedAsync()
+      // {
+      //     var httpContext = Context.GetHttpContext();
+      //     var userId = httpContext.Request.Query["userId"];
+      //
+      //     if (!string.IsNullOrEmpty(userId))
+      //     {
+      //         await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{userId}");
+      //         Console.WriteLine($"Usuario {userId} conectado al grupo user_{userId}");
+      //     }
+      //
+      //     await base.OnConnectedAsync();
+       // }
 
-            if (!string.IsNullOrEmpty(userId))
-            {
-                await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{userId}");
-                Console.WriteLine($"Usuario {userId} conectado al grupo user_{userId}");
-            }
+       // public override async Task OnDisconnectedAsync(Exception exception)
+       // {
+       //     var httpContext = Context.GetHttpContext();
+       //     var userId = httpContext.Request.Query["userId"];
+       //
+       //     if (!string.IsNullOrEmpty(userId))
+       //     {
+       //         await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"user_{userId}");
+       //         Console.WriteLine($"Usuario {userId} desconectado del grupo user_{userId}");
+       //     }
+       //
+       //     await base.OnDisconnectedAsync(exception);
+       // }
 
-            await base.OnConnectedAsync();
-        }
 
-        public override async Task OnDisconnectedAsync(Exception exception)
-        {
-            var httpContext = Context.GetHttpContext();
-            var userId = httpContext.Request.Query["userId"];
 
-            if (!string.IsNullOrEmpty(userId))
-            {
-                await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"user_{userId}");
-                Console.WriteLine($"Usuario {userId} desconectado del grupo user_{userId}");
-            }
 
-            await base.OnDisconnectedAsync(exception);
-        }
+
+
+
+
 
 
         public async Task NotificarLlamadaEntrante(string destinatarioId, string remitenteId, string remitenteNombre)

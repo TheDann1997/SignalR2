@@ -3,16 +3,32 @@
   "WorkspaceRootPath": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2\\hubs\\chathub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:hubs\\chathub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2\\models\\mensaje.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:models\\mensaje.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2\\controllers\\archivoscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:controllers\\archivoscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2\\hubs\\chathub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:hubs\\chathub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2\\models\\usuariogrupo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:models\\usuariogrupo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2\\signalr.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:signalr.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,44 +38,92 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "Mensaje.cs",
+              "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Models\\Mensaje.cs",
+              "RelativeDocumentMoniker": "Models\\Mensaje.cs",
+              "ToolTip": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Models\\Mensaje.cs",
+              "RelativeToolTip": "Models\\Mensaje.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-04T16:23:03.969Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "ArchivosController.cs",
               "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Controllers\\ArchivosController.cs",
               "RelativeDocumentMoniker": "Controllers\\ArchivosController.cs",
               "ToolTip": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Controllers\\ArchivosController.cs",
               "RelativeToolTip": "Controllers\\ArchivosController.cs",
-              "ViewState": "AgIAABAAAAAAAAAAAAAQwCAAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-27T01:37:19.22Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAADsAAAAAAAAAAAAqwE8AAAACAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-19T17:12:54.544Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
               "Title": "ChatHub.cs",
               "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Hubs\\ChatHub.cs",
               "RelativeDocumentMoniker": "Hubs\\ChatHub.cs",
               "ToolTip": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Hubs\\ChatHub.cs",
               "RelativeToolTip": "Hubs\\ChatHub.cs",
-              "ViewState": "AgIAANIAAAAAAAAAAAAswOQAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAABsAAAAAAAAAAAAowD8AAABMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-15T15:19:05.117Z"
+              "WhenOpened": "2025-05-15T15:19:05.117Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "UsuarioGrupo.cs",
+              "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Models\\UsuarioGrupo.cs",
+              "RelativeDocumentMoniker": "Models\\UsuarioGrupo.cs",
+              "ToolTip": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Models\\UsuarioGrupo.cs",
+              "RelativeToolTip": "Models\\UsuarioGrupo.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-06T20:55:21.845Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "SignalR.csproj",
+              "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\SignalR.csproj",
+              "RelativeDocumentMoniker": "SignalR.csproj",
+              "ToolTip": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\SignalR.csproj",
+              "RelativeToolTip": "SignalR.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-06-06T21:33:48.585Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAE0AAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-19T17:12:54.544Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Data\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "Data\\AppDbContext.cs",
+              "ToolTip": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Data\\AppDbContext.cs",
+              "RelativeToolTip": "Data\\AppDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAA3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-06T21:00:35.075Z"
             }
           ]
         }

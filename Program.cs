@@ -1,33 +1,42 @@
-using Microsoft.AspNetCore.Http.Features;
+﻿using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using SignalR.Data;
 using SignalR.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Servicios
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// SignalR
+// SignalR con límite de 200 MB
 builder.Services.AddSignalR(options =>
 {
-    options.MaximumReceiveMessageSize = 200 * 1024 * 1024; // 200 MB
+    options.MaximumReceiveMessageSize = 200 * 1024 * 1024;
 });
 
-// Aumentar l�mite de tama�o para archivos grandes
+// Aumentar límite para subida de archivos grandes
 builder.Services.Configure<FormOptions>(options =>
 {
-    options.MultipartBodyLengthLimit = 200 * 1024 * 1024; // 200 MB
+    options.MultipartBodyLengthLimit = 200 * 1024 * 1024;
 });
 
+// DB Context
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
+    new MySqlServerVersion(new Version(8, 0, 36))));
+
+// Kestrel - límite de tamaño
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.Limits.MaxRequestBodySize = 200 * 1024 * 1024; // 200 MB
+    serverOptions.Limits.MaxRequestBodySize = 200 * 1024 * 1024;
 });
 
-// CORS: Permite cualquier origen (�til para desarrollo)
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -40,31 +49,23 @@ builder.Services.AddCors(options =>
     });
 });
 
-// CustomUserIdProvider
-builder.Services.AddSingleton<IUserIdProvider, SignalR.Hubs.CustomUserIdProvider>();
+// Custom UserIdProvider para SignalR
+builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else
+{
+    app.UseHttpsRedirection();
+}
 
-// app.UseHttpsRedirection();
-
-app.UseCors();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.MapHub<SignalR.Hubs.ChatHub>("/chathub");
-
-app.UseStaticFiles();
-
-// Para la carpeta "uploads":
+app.UseStaticFiles(); // Archivos wwwroot
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
@@ -72,55 +73,12 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/uploads"
 });
 
-app.Run();
+app.UseRouting();
+app.UseCors();
+app.UseAuthentication(); // ← si usarás login
+app.UseAuthorization();
 
- 
-//using Microsoft.AspNetCore.SignalR;
-//using SignalR.Hubs;
-//
-//var builder = WebApplication.CreateBuilder(args);
-//
-//// Servicios
-//builder.Services.AddControllers();
-//builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
-//
-//builder.Services.AddSignalR(options =>
-//{
-//    options.MaximumReceiveMessageSize = 200 * 1024 * 1024; // 200MB
-//});
-//
-//// Habilita CORS
-//builder.Services.AddCors(options =>
-//{
-//    options.AddDefaultPolicy(policy =>
-//    {
-//        policy.AllowAnyHeader()
-//              .AllowAnyMethod()
-//              .AllowCredentials()
-//              .SetIsOriginAllowed(_ => true);
-//    });
-//});
-//
-//// Custom User ID
-//builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
-//
-//var app = builder.Build();
-//
-//// Middlewares
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
-//
-//app.UseHttpsRedirection();
-//
-//app.UseCors(); // <-- importante
-//
-//app.UseAuthorization();
-//
-//app.MapControllers();
-//app.MapHub<ChatHub>("/chathub"); // <-- endpoint para SignalR
-//app.Run("http://0.0.0.0:10000");
-//
+app.MapControllers();
+app.MapHub<ChatHub>("/chathub");
+
+app.Run();

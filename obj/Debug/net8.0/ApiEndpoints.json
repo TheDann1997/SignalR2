@@ -1,6 +1,22 @@
 [
   {
     "ContainingType": "SignalR.Controllers.ArchivosController",
+    "Method": "DescargarArchivo",
+    "RelativePath": "api/Archivos/Descargar/{nombreArchivo}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "nombreArchivo",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SignalR.Controllers.ArchivosController",
     "Method": "Subir",
     "RelativePath": "api/Archivos/Subir",
     "HttpMethod": "POST",
