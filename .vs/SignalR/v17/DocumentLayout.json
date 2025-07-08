@@ -7,6 +7,10 @@
       "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:hubs\\chathub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2\\models\\usuariogrupo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:models\\usuariogrupo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2\\models\\mensaje.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:models\\mensaje.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -21,10 +25,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2\\models\\usuariogrupo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:models\\usuariogrupo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2\\signalr.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
@@ -42,7 +42,7 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Mensaje.cs",
               "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Models\\Mensaje.cs",
               "RelativeDocumentMoniker": "Models\\Mensaje.cs",
@@ -54,7 +54,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "ArchivosController.cs",
               "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Controllers\\ArchivosController.cs",
               "RelativeDocumentMoniker": "Controllers\\ArchivosController.cs",
@@ -72,14 +72,14 @@
               "RelativeDocumentMoniker": "Hubs\\ChatHub.cs",
               "ToolTip": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Hubs\\ChatHub.cs",
               "RelativeToolTip": "Hubs\\ChatHub.cs",
-              "ViewState": "AgIAABsAAAAAAAAAAAAowD8AAABMAAAAAAAAAA==",
+              "ViewState": "AgIAAAoAAAAAAAAAAAD4v0gAAAA5AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-15T15:19:05.117Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 1,
               "Title": "UsuarioGrupo.cs",
               "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Models\\UsuarioGrupo.cs",
               "RelativeDocumentMoniker": "Models\\UsuarioGrupo.cs",
@@ -87,7 +87,8 @@
               "RelativeToolTip": "Models\\UsuarioGrupo.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-06T20:55:21.845Z"
+              "WhenOpened": "2025-06-06T20:55:21.845Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -103,7 +104,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -115,7 +116,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "AppDbContext.cs",
               "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\Data\\AppDbContext.cs",
               "RelativeDocumentMoniker": "Data\\AppDbContext.cs",
