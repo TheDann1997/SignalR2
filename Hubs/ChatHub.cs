@@ -69,7 +69,7 @@ namespace SignalR.Hubs
         {
 
 
-            //Console.WriteLine($"Se recibio un visto para {destinatarioId}");
+            Console.WriteLine($"Se recibio un visto para {destinatarioId}");
             await Clients.Group($"user_{destinatarioId}")
               .SendAsync("RecibirVisto", destinatarioId, myID);
         }
@@ -168,11 +168,11 @@ namespace SignalR.Hubs
                 .SendAsync("LlamadaEntrante", destinatarioId, usercall);
         }
 
-        public async Task AceptarLlamada(string destinatarioId, string remitenteId)
+        public async Task AceptarLlamada(string destinatarioId, Usuario usuario)
         {
-            Console.WriteLine($"Llamada aceptada por {remitenteId} para {destinatarioId}");
+           // Console.WriteLine($"Llamada aceptada  para {destinatarioId}");
             await Clients.Group($"user_{destinatarioId}")
-                .SendAsync("LlamadaAceptada", destinatarioId, remitenteId);
+                .SendAsync("LlamadaAceptada", destinatarioId, usuario);
         }
 
 
