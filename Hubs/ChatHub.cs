@@ -75,7 +75,7 @@ namespace SignalR.Hubs
         }
 
 
-
+      
 
 
 
@@ -203,6 +203,13 @@ namespace SignalR.Hubs
         {
             await Clients.Group($"user_{destinatarioId}")
                 .SendAsync("RecibirIceCandidate", candidato);
+        }
+
+
+        public async Task CambiarModoPantalla(string destinatarioId, bool activo)
+        {
+            await Clients.Group($"user_{destinatarioId}")
+                .SendAsync("ModoPantallaRemoto", activo);
         }
 
         //opcionale para ams adekante
