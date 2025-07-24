@@ -31,30 +31,75 @@ namespace SignalR.Hubs
                       .SendAsync("RecibirMensaje", mensaje);
             }
         }
-        public async Task EnviarReaccion(string nombreRemitente, string reaccion, string destinatarioId, string mensajeIdReaccion)
-        {
-           
 
-            //Console.WriteLine($"llego una reaccion para el usuario con ID {destinatarioId}");
-            await Clients.Group($"user_{destinatarioId}")
-              .SendAsync("RecibirNotificaiondeReaccion", nombreRemitente, reaccion, mensajeIdReaccion);
+
+        // ... existing code ...
+        public async Task EnviarReaccion(string nombreRemitente, string reaccion, string destinatarioId, string mensajeIdReaccion, int? grupoId = null)
+        {
+            try
+            {
+                if (grupoId != null)
+                {
+                    await Clients.Group($"grupo_{grupoId}")
+                        .SendAsync("RecibirNotificaiondeReaccion", nombreRemitente, reaccion, mensajeIdReaccion);
+                }
+                else
+                {
+                    await Clients.Group($"user_{destinatarioId}")
+                        .SendAsync("RecibirNotificaiondeReaccion", nombreRemitente, reaccion, mensajeIdReaccion);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error en EnviarReaccion: " + ex.Message + "\n" + ex.StackTrace);
+                throw;
+            }
         }
+        // ... existing code ...
+
         public async Task EnviarMensajeConRespuesta(Mensaje mensajerespondido, string NombreDelRemitente)
         {
-            if (mensajerespondido.EsGrupal)
+            if (mensajerespondido.EsGrupal && mensajerespondido.GrupoId != null)
             {
-               // await Clients.OthersInGroup($"grupo_{mensajerespondido.GrupoId}")
-         // .SendAsync("RecibirMensajeConRespuesta", mensajerespondido);
+                await Clients.Group($"grupo_{mensajerespondido.GrupoId}")
+                    .SendAsync("RecibirMensajeConRespuesta", mensajerespondido, NombreDelRemitente);
             }
             else
             {
                 await Clients.Group($"user_{mensajerespondido.DestinatarioId}")
-               .SendAsync("RecibirMensajeConRespuesta", mensajerespondido, NombreDelRemitente);
+                    .SendAsync("RecibirMensajeConRespuesta", mensajerespondido, NombreDelRemitente);
             }
-
-            //Console.WriteLine($"llego una reaccion para el usuario con ID {destinatarioId}");
-           
         }
+
+
+
+       // public async Task EnviarReaccion(string nombreRemitente, string reaccion, string destinatarioId, string mensajeIdReaccion)
+      // {
+      //    
+      //
+      //     //Console.WriteLine($"llego una reaccion para el usuario con ID {destinatarioId}");
+      //     await Clients.Group($"user_{destinatarioId}")
+      //       .SendAsync("RecibirNotificaiondeReaccion", nombreRemitente, reaccion, mensajeIdReaccion);
+      // }
+     //  public async Task EnviarMensajeConRespuesta(Mensaje mensajerespondido, string NombreDelRemitente)
+     //  {
+     //      if (mensajerespondido.EsGrupal)
+     //      {
+     //         // await Clients.OthersInGroup($"grupo_{mensajerespondido.GrupoId}")
+     //   // .SendAsync("RecibirMensajeConRespuesta", mensajerespondido);
+     //      }
+     //      else
+     //      {
+     //          await Clients.Group($"user_{mensajerespondido.DestinatarioId}")
+     //         .SendAsync("RecibirMensajeConRespuesta", mensajerespondido, NombreDelRemitente);
+     //      }
+     //
+     //      //Console.WriteLine($"llego una reaccion para el usuario con ID {destinatarioId}");
+     //     
+     //  }
+
+
+
         public async Task EnviarEscribiendoMensaje(string destinatarioId,string myID, string MyAvatar)
         {
 
