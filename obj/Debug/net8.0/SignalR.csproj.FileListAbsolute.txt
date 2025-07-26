@@ -35,3 +35,4 @@ C:\Users\daniel.agudelo\Desktop\SignalR2\obj\Debug\net8.0\refint\SignalR.dll
 C:\Users\daniel.agudelo\Desktop\SignalR2\obj\Debug\net8.0\SignalR.pdb
 C:\Users\daniel.agudelo\Desktop\SignalR2\obj\Debug\net8.0\SignalR.genruntimeconfig.cache
 C:\Users\daniel.agudelo\Desktop\SignalR2\obj\Debug\net8.0\ref\SignalR.dll
+C:\Users\daniel.agudelo\Desktop\SignalR2\bin\Debug\net8.0\uploads\bb6fbe42-5d65-475e-b28e-5d7fbab4842e_package.json

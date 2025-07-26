@@ -20,7 +20,7 @@ namespace SignalR.Hubs
         {
             if (mensaje.EsGrupal)
             {
-                //Console.WriteLine($"llego un mensaje para el grupo con ID {destinatarioId}");
+                Console.WriteLine($"llego un mensaje para el grupo con ID {destinatarioId}");
                 await Clients.OthersInGroup($"grupo_{destinatarioId}")
                       .SendAsync("RecibirMensaje", mensaje);
             }
@@ -40,11 +40,13 @@ namespace SignalR.Hubs
             {
                 if (grupoId != null)
                 {
-                    await Clients.Group($"grupo_{grupoId}")
+                    // Para grupos: enviar solo al autor del mensaje original
+                    await Clients.Group($"user_{destinatarioId}")
                         .SendAsync("RecibirNotificaiondeReaccion", nombreRemitente, reaccion, mensajeIdReaccion);
                 }
                 else
                 {
+                    // Para individual: enviar al destinatario normal
                     await Clients.Group($"user_{destinatarioId}")
                         .SendAsync("RecibirNotificaiondeReaccion", nombreRemitente, reaccion, mensajeIdReaccion);
                 }
@@ -54,8 +56,7 @@ namespace SignalR.Hubs
                 Console.WriteLine("Error en EnviarReaccion: " + ex.Message + "\n" + ex.StackTrace);
                 throw;
             }
-        }
-        // ... existing code ...
+        } // ... existing code ...
 
         public async Task EnviarMensajeConRespuesta(Mensaje mensajerespondido, string NombreDelRemitente)
         {
@@ -106,9 +107,14 @@ namespace SignalR.Hubs
 
             Console.WriteLine($"escribiendo en signalR para {destinatarioId}");
            await Clients.Group($"user_{destinatarioId}")
-             .SendAsync("RecibirEscribiendo", destinatarioId, myID, MyAvatar);
+             .SendAsync("RecibirEscribiendo", destinatarioId, myID, MyAvatar, "INDIVIDUAL");
         }
-
+        public async Task EnviarEscribiendoGrupo(string grupoId, string myID, string MyAvatar)
+        {
+            Console.WriteLine($"escribiendo en signalR para grupo {grupoId}");
+            await Clients.OthersInGroup($"grupo_{grupoId}")
+                .SendAsync("RecibirEscribiendo", grupoId, myID, MyAvatar, "GRUPO");
+        }
 
         public async Task EnviarVisto(string destinatarioId, string myID)
         {
