@@ -341,7 +341,6 @@
       try {
         signalRConnection = new signalR.HubConnectionBuilder()
           .withUrl(`https://signalr2.onrender.com/chathub?userId=${userId}`)
-		  <!-- .withUrl(`http://localhost:5127/chathub?userId=${userId}`) -->
           .configureLogging(signalR.LogLevel.Information)
           .build();
 
@@ -368,9 +367,17 @@
           // Aquí podrías manejar participantes existentes
         });
 
+        signalRConnection.on("EnviarOfertasAExistentes", async (salaId, participantesIds) => {
+          console.log(`Debo enviar ofertas a: ${participantesIds.join(', ')}`);
+          for (const participanteId of participantesIds) {
+            await enviarOfertaA(participanteId);
+          }
+        });
+
         signalRConnection.on("ListaParticipantes", (salaId, participantes) => {
           console.log(`Lista de participantes en sala ${salaId}:`, participantes);
           // Actualizar lista de participantes en la UI
+          actualizarListaParticipantes(participantes);
         });
 
         signalRConnection.on("RecibirOfertaSala", (salaId, userId, ofertaSDP) => {
@@ -478,6 +485,9 @@
         videoRoom.classList.add('active');
         
         updateStatus(`En sala: ${salaId}`, 'connected');
+
+        // Obtener lista de participantes
+        await signalRConnection.invoke("ObtenerParticipantesSala", salaId);
         
       } catch (err) {
         console.error('Error obteniendo medios:', err);
@@ -543,18 +553,8 @@
 
     // Manejar usuario unido
     async function handleUserJoined(userId, ofertaSDP) {
-      const pc = createPeerConnection(userId);
-      peerConnections.set(userId, pc);
-
-      if (localStream) {
-        localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-      }
-
-      await pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(ofertaSDP)));
-      const respuesta = await pc.createAnswer();
-      await pc.setLocalDescription(respuesta);
-
-      signalRConnection.invoke("EnviarRespuestaSala", salaId, userId, JSON.stringify(respuesta));
+      console.log(`Nuevo usuario ${userId} se unió, enviando oferta`);
+      await enviarOfertaA(userId);
     }
 
     // Manejar oferta
@@ -589,6 +589,29 @@
       const pc = peerConnections.get(userId);
       if (pc && pc.remoteDescription) {
         await pc.addIceCandidate(new RTCIceCandidate(JSON.parse(candidato)));
+      }
+    }
+
+    // Enviar oferta a un participante específico
+    async function enviarOfertaA(userId) {
+      try {
+        let pc = peerConnections.get(userId);
+        if (!pc) {
+          pc = createPeerConnection(userId);
+          peerConnections.set(userId, pc);
+
+          if (localStream) {
+            localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+          }
+        }
+
+        const oferta = await pc.createOffer();
+        await pc.setLocalDescription(oferta);
+
+        signalRConnection.invoke("EnviarOfertaSala", salaId, userId, JSON.stringify(oferta));
+        console.log(`Oferta enviada a ${userId}`);
+      } catch (err) {
+        console.error(`Error enviando oferta a ${userId}:`, err);
       }
     }
 
@@ -660,6 +683,33 @@
         `;
         participantsContainer.appendChild(item);
       }
+    }
+
+    // Actualizar lista de participantes desde el servidor
+    function actualizarListaParticipantes(participantes) {
+      participantsContainer.innerHTML = '';
+      
+      // Agregar participante local
+      const localItem = document.createElement('div');
+      localItem.className = 'participant-item';
+      localItem.innerHTML = `
+        <div class="status-indicator"></div>
+        <span>Tú (${localUserId})</span>
+      `;
+      participantsContainer.appendChild(localItem);
+
+      // Agregar participantes del servidor
+      participantes.forEach(participante => {
+        if (participante.UsuarioId !== localUserId) {
+          const item = document.createElement('div');
+          item.className = 'participant-item';
+          item.innerHTML = `
+            <div class="status-indicator"></div>
+            <span>Usuario ${participante.UsuarioId}</span>
+          `;
+          participantsContainer.appendChild(item);
+        }
+      });
     }
 
     // Event listeners

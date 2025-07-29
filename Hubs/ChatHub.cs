@@ -432,7 +432,7 @@ namespace SignalR.Hubs
                 // Unirse al grupo de SignalR
                 await Groups.AddToGroupAsync(Context.ConnectionId, $"sala_{salaIdInt}");
 
-                // Notificar a otros participantes
+                // Notificar a otros participantes que se unió alguien nuevo
                 await Clients.OthersInGroup($"sala_{salaIdInt}")
                     .SendAsync("UsuarioUnidoASala", salaIdInt.ToString(), userId, "");
 
@@ -445,6 +445,12 @@ namespace SignalR.Hubs
                 foreach (var participanteId in participantesActivos)
                 {
                     await Clients.Caller.SendAsync("ParticipanteExistente", salaIdInt.ToString(), participanteId);
+                }
+
+                // Notificar al nuevo usuario que debe enviar ofertas a los participantes existentes
+                if (participantesActivos.Any())
+                {
+                    await Clients.Caller.SendAsync("EnviarOfertasAExistentes", salaIdInt.ToString(), participantesActivos);
                 }
                 
                 Console.WriteLine($"Usuario {userId} se unió a la sala {salaIdInt}");
@@ -523,8 +529,14 @@ namespace SignalR.Hubs
         {
             try
             {
+                // Validar que salaId sea un número
+                if (!int.TryParse(salaId, out int salaIdInt))
+                {
+                    return;
+                }
+
                 var participantes = await _context.ParticipantesLlamada
-                    .Where(p => p.LlamadaGrupal.GrupoId.ToString() == salaId && p.Activo)
+                    .Where(p => p.LlamadaGrupal.GrupoId == salaIdInt && p.Activo)
                     .Select(p => new
                     {
                         UsuarioId = p.UsuarioId,
@@ -535,7 +547,7 @@ namespace SignalR.Hubs
                     })
                     .ToListAsync();
 
-                await Clients.Caller.SendAsync("ListaParticipantes", salaId, participantes);
+                await Clients.Caller.SendAsync("ListaParticipantes", salaIdInt.ToString(), participantes);
             }
             catch (Exception ex)
             {
