@@ -12,11 +12,11 @@ namespace SignalR.Hubs
         public string GetUserId(HubConnectionContext connection)
         {
             // Lee el parámetro "userId" de la URL de conexión
-         
-
             var httpContext = connection.GetHttpContext();
-            return httpContext?.Request.Query["userId"];
-
+            var userId = httpContext?.Request.Query["userId"].ToString();
+            
+            Console.WriteLine($"🔑 CustomUserIdProvider: userId = '{userId}'");
+            return userId;
         }
     }
 }

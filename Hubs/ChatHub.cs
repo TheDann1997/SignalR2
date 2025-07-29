@@ -545,6 +545,9 @@ namespace SignalR.Hubs
         public async Task EnviarOfertaSala(string salaId, string destinatarioId, string ofertaSDP)
         {
             Console.WriteLine($"📤 Enviando oferta de {Context.UserIdentifier} a {destinatarioId} en sala {salaId}");
+            Console.WriteLine($"🔑 Context.UserIdentifier: '{Context.UserIdentifier}'");
+            Console.WriteLine($"🎯 Destinatario: '{destinatarioId}'");
+            
             // Enviar solo al destinatario específico, no a todo el grupo
             await Clients.User(destinatarioId).SendAsync("RecibirOfertaSala", salaId, Context.UserIdentifier, ofertaSDP);
             Console.WriteLine($"✅ Oferta enviada de {Context.UserIdentifier} a {destinatarioId}");
@@ -553,6 +556,9 @@ namespace SignalR.Hubs
         public async Task EnviarRespuestaSala(string salaId, string destinatarioId, string respuestaSDP)
         {
             Console.WriteLine($"📤 Enviando respuesta de {Context.UserIdentifier} a {destinatarioId} en sala {salaId}");
+            Console.WriteLine($"🔑 Context.UserIdentifier: '{Context.UserIdentifier}'");
+            Console.WriteLine($"🎯 Destinatario: '{destinatarioId}'");
+            
             // Enviar solo al destinatario específico, no a todo el grupo
             await Clients.User(destinatarioId).SendAsync("RecibirRespuestaSala", salaId, Context.UserIdentifier, respuestaSDP);
             Console.WriteLine($"✅ Respuesta enviada de {Context.UserIdentifier} a {destinatarioId}");
@@ -601,8 +607,44 @@ namespace SignalR.Hubs
         public async Task DebugEnviarMensaje(string destinatarioId, string mensaje)
         {
             Console.WriteLine($"🐛 Debug: Enviando mensaje de {Context.UserIdentifier} a {destinatarioId}: {mensaje}");
-            await Clients.User(destinatarioId).SendAsync("DebugRecibirMensaje", Context.UserIdentifier, mensaje);
-            Console.WriteLine($"✅ Debug: Mensaje enviado");
+            Console.WriteLine($"🔑 Context.UserIdentifier: '{Context.UserIdentifier}'");
+            Console.WriteLine($"🎯 Destinatario: '{destinatarioId}'");
+            
+            try
+            {
+                await Clients.User(destinatarioId).SendAsync("DebugRecibirMensaje", Context.UserIdentifier, mensaje);
+                Console.WriteLine($"✅ Debug: Mensaje enviado exitosamente");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Debug: Error enviando mensaje: {ex.Message}");
+            }
+        }
+
+        // Método de debug para listar usuarios conectados
+        public async Task DebugListarUsuarios()
+        {
+            Console.WriteLine($"🔍 Debug: Usuario {Context.UserIdentifier} solicitando lista de usuarios");
+            Console.WriteLine($"🔑 Context.UserIdentifier: '{Context.UserIdentifier}'");
+            
+            // Enviar confirmación al usuario que solicitó la lista
+            await Clients.Caller.SendAsync("DebugListaUsuarios", $"Usuario {Context.UserIdentifier} está conectado");
+        }
+
+        // Método de fallback para enviar a todo el grupo
+        public async Task DebugEnviarAGrupo(string salaId, string mensaje)
+        {
+            Console.WriteLine($"🐛 Debug Grupo: Enviando mensaje de {Context.UserIdentifier} a grupo sala_{salaId}: {mensaje}");
+            
+            try
+            {
+                await Clients.Group($"sala_{salaId}").SendAsync("DebugRecibirMensajeGrupo", Context.UserIdentifier, mensaje);
+                Console.WriteLine($"✅ Debug Grupo: Mensaje enviado exitosamente");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Debug Grupo: Error enviando mensaje: {ex.Message}");
+            }
         }
     }
 } 

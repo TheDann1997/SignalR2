@@ -258,6 +258,12 @@
         <button class="btn btn-danger" id="debugBtn">
           <i class="ph ph-bug"></i> Debug Comunicación
         </button>
+        <button class="btn btn-warning" id="debugListBtn">
+          <i class="ph ph-list"></i> Debug Lista
+        </button>
+        <button class="btn btn-info" id="debugGrupoBtn">
+          <i class="ph ph-users"></i> Debug Grupo
+        </button>
       </div>
       
       <div id="statusDiv" class="status disconnected">
@@ -324,6 +330,8 @@
     const toggleScreen = document.getElementById('toggleScreen');
     const endCallBtn = document.getElementById('endCallBtn');
     const debugBtn = document.getElementById('debugBtn');
+    const debugListBtn = document.getElementById('debugListBtn');
+    const debugGrupoBtn = document.getElementById('debugGrupoBtn');
 
     // Función para actualizar estado
     function updateStatus(message, type = 'warning') {
@@ -411,6 +419,14 @@
 
         signalRConnection.on("DebugRecibirMensaje", (remitenteId, mensaje) => {
           console.log(`🐛 Debug: Recibido mensaje de ${remitenteId}: ${mensaje}`);
+        });
+
+        signalRConnection.on("DebugListaUsuarios", (mensaje) => {
+          console.log(`🔍 Debug: ${mensaje}`);
+        });
+
+        signalRConnection.on("DebugRecibirMensajeGrupo", (remitenteId, mensaje) => {
+          console.log(`🐛 Debug Grupo: Recibido mensaje de ${remitenteId}: ${mensaje}`);
         });
 
         await signalRConnection.start();
@@ -802,6 +818,8 @@
     createSalaBtn.addEventListener('click', createSala);
     joinSalaBtn.addEventListener('click', joinSala);
     debugBtn.addEventListener('click', debugComunicacion);
+    debugListBtn.addEventListener('click', debugListaParticipantes);
+    debugGrupoBtn.addEventListener('click', debugGrupo);
 
     // Función de debug para probar comunicación
     async function debugComunicacion() {
@@ -813,6 +831,35 @@
         } catch (err) {
           console.error('Error en debug:', err);
         }
+      }
+    }
+
+    // Función de debug para probar la lista de participantes
+    async function debugListaParticipantes() {
+      if (signalRConnection && signalRConnection.state === "Connected") {
+        try {
+          const participantes = await signalRConnection.invoke("ObtenerParticipantesSala", salaId);
+          console.log(`👥 Lista de participantes en sala ${salaId}:`, participantes);
+          updateParticipantsList(participantes); // Actualizar la lista en la UI
+        } catch (err) {
+          console.error('Error en debug de lista:', err);
+        }
+      } else {
+        alert('Primero debes conectarte y estar en una sala.');
+      }
+    }
+
+    // Función de debug para probar la comunicación de grupo
+    async function debugGrupo() {
+      if (signalRConnection && signalRConnection.state === "Connected" && salaId) {
+        try {
+          await signalRConnection.invoke("DebugEnviarAGrupo", salaId, `Hola desde ${localUserId} a todos!`);
+          console.log(`👥 Debug Grupo: Mensaje enviado a todos en sala ${salaId}`);
+        } catch (err) {
+          console.error('Error en debug de grupo:', err);
+        }
+      } else {
+        alert('Primero debes conectarte y estar en una sala.');
       }
     }
 
