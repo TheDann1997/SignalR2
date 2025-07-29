@@ -467,8 +467,8 @@
     }
 
     // Entrar a la sala
-    async function enterRoom(salaId) {
-      salaId = salaId;
+    async function enterRoom(salaIdParam) {
+      salaId = salaIdParam; // Asignar al global
       currentSalaName.textContent = salaId;
       
       try {
@@ -508,16 +508,21 @@
       };
 
       pc.ontrack = event => {
-        console.log(`Recibido stream de ${userId}`);
-        const videoElement = createVideoElement(userId, `Usuario ${userId}`);
-        videoElement.srcObject = event.streams[0];
-        participants.set(userId, {
-          name: `Usuario ${userId}`,
-          stream: event.streams[0],
-          videoElement: videoElement,
-          pc: pc
-        });
-        updateParticipantsList();
+        console.log(`🎬 Recibido stream de ${userId}`, event.streams);
+        if (event.streams && event.streams.length > 0) {
+          const videoElement = createVideoElement(userId, `Usuario ${userId}`);
+          videoElement.srcObject = event.streams[0];
+          participants.set(userId, {
+            name: `Usuario ${userId}`,
+            stream: event.streams[0],
+            videoElement: videoElement,
+            pc: pc
+          });
+          console.log(`✅ Video creado para ${userId}`);
+          updateParticipantsList();
+        } else {
+          console.warn(`⚠️ No hay streams en el evento ontrack de ${userId}`);
+        }
       };
 
       pc.onconnectionstatechange = () => {
@@ -559,21 +564,37 @@
 
     // Manejar oferta
     async function handleOffer(userId, ofertaSDP) {
+      console.log(`📥 Recibida oferta de ${userId}, procesando...`);
       let pc = peerConnections.get(userId);
       if (!pc) {
+        console.log(`📡 Creando nueva conexión peer para ${userId} (desde handleOffer)`);
         pc = createPeerConnection(userId);
         peerConnections.set(userId, pc);
 
         if (localStream) {
+          console.log(`🎥 Agregando tracks locales a la conexión con ${userId} (desde handleOffer)`);
           localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+        } else {
+          console.warn(`⚠️ No hay localStream disponible para ${userId} (desde handleOffer)`);
         }
       }
 
-      await pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(ofertaSDP)));
-      const respuesta = await pc.createAnswer();
-      await pc.setLocalDescription(respuesta);
+      try {
+        console.log(`🔄 Estableciendo descripción remota para ${userId}`);
+        await pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(ofertaSDP)));
+        console.log(`✅ Descripción remota establecida para ${userId}`);
+        
+        console.log(`🔄 Creando respuesta para ${userId}`);
+        const respuesta = await pc.createAnswer();
+        await pc.setLocalDescription(respuesta);
+        console.log(`✅ Respuesta creada y establecida para ${userId}`);
 
-      signalRConnection.invoke("EnviarRespuestaSala", salaId, userId, JSON.stringify(respuesta));
+        console.log(`📤 Enviando respuesta a ${userId}`);
+        signalRConnection.invoke("EnviarRespuestaSala", salaId, userId, JSON.stringify(respuesta));
+        console.log(`✅ Respuesta enviada a ${userId}`);
+      } catch (err) {
+        console.error(`❌ Error procesando oferta de ${userId}:`, err);
+      }
     }
 
     // Manejar respuesta
@@ -595,23 +616,29 @@
     // Enviar oferta a un participante específico
     async function enviarOfertaA(userId) {
       try {
+        console.log(`🔄 Enviando oferta a ${userId}...`);
         let pc = peerConnections.get(userId);
         if (!pc) {
+          console.log(`📡 Creando nueva conexión peer para ${userId}`);
           pc = createPeerConnection(userId);
           peerConnections.set(userId, pc);
 
           if (localStream) {
+            console.log(`🎥 Agregando tracks locales a la conexión con ${userId}`);
             localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+          } else {
+            console.warn(`⚠️ No hay localStream disponible para ${userId}`);
           }
         }
 
         const oferta = await pc.createOffer();
         await pc.setLocalDescription(oferta);
 
+        console.log(`📤 Invocando EnviarOfertaSala para ${userId}`);
         signalRConnection.invoke("EnviarOfertaSala", salaId, userId, JSON.stringify(oferta));
-        console.log(`Oferta enviada a ${userId}`);
+        console.log(`✅ Oferta enviada a ${userId}`);
       } catch (err) {
-        console.error(`Error enviando oferta a ${userId}:`, err);
+        console.error(`❌ Error enviando oferta a ${userId}:`, err);
       }
     }
 
@@ -716,6 +743,13 @@
     connectBtn.addEventListener('click', connectToSignalR);
     createSalaBtn.addEventListener('click', createSala);
     joinSalaBtn.addEventListener('click', joinSala);
+
+    // Evento para cuando se cierra la página
+    window.addEventListener('beforeunload', () => {
+      if (signalRConnection && signalRConnection.state === "Connected" && salaId && localUserId) {
+        signalRConnection.invoke("SalirDeSala", salaId, localUserId);
+      }
+    });
 
     toggleCamera.addEventListener('click', () => {
       if (localStream) {

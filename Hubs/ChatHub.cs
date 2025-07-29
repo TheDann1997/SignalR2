@@ -153,30 +153,63 @@ namespace SignalR.Hubs
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            var httpContext = Context.GetHttpContext();
-            var userIdString = httpContext.Request.Query["userId"];
-
-            if (int.TryParse(userIdString, out int userId))
+            try
             {
-                // 🔸 Remover del grupo individual
-                await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"user_{userId}");
-                Console.WriteLine($"Usuario {userId} desconectado del grupo individual user_{userId}");
+                var httpContext = Context.GetHttpContext();
+                var userIdString = httpContext.Request.Query["userId"];
 
-                // 🔸 Obtener grupos grupales desde la base de datos
-                var grupos = _context.UsuariosGrupos
-                    .Where(ug => ug.UsuarioId == userId)
-                    .Select(ug => ug.GrupoId)
-                    .ToList();
-
-                foreach (var grupoId in grupos)
+                if (!string.IsNullOrEmpty(userIdString))
                 {
-                    string nombreGrupo = $"grupo_{grupoId}";
-                    await Groups.RemoveFromGroupAsync(Context.ConnectionId, nombreGrupo);
-                    Console.WriteLine($"Usuario {userId} removido de grupo {nombreGrupo}");
-                }
-            }
+                    // Buscar en qué salas está el usuario y marcarlo como inactivo
+                    var participacionesActivas = await _context.ParticipantesLlamada
+                        .Include(p => p.LlamadaGrupal)
+                        .Where(p => p.UsuarioId == userIdString && p.Activo)
+                        .ToListAsync();
 
-            await base.OnDisconnectedAsync(exception);
+                    foreach (var participacion in participacionesActivas)
+                    {
+                        participacion.Activo = false;
+                        participacion.FechaSalida = DateTime.UtcNow;
+
+                        // Si es el iniciador, terminar la sala
+                        if (participacion.LlamadaGrupal.IniciadorId == userIdString)
+                        {
+                            participacion.LlamadaGrupal.Activa = false;
+                            participacion.LlamadaGrupal.FechaFin = DateTime.UtcNow;
+                        }
+                        else
+                        {
+                            // Notificar a otros participantes
+                            await Clients.OthersInGroup($"sala_{participacion.LlamadaGrupal.GrupoId}")
+                                .SendAsync("UsuarioSalioDeSala", participacion.LlamadaGrupal.GrupoId.ToString(), userIdString);
+                        }
+                    }
+
+                    if (participacionesActivas.Any())
+                    {
+                        await _context.SaveChangesAsync();
+                    }
+
+                    // Remover de grupos de SignalR
+                    var grupos = await _context.ParticipantesLlamada
+                        .Where(p => p.UsuarioId == userIdString && p.Activo == false)
+                        .Select(p => $"sala_{p.LlamadaGrupal.GrupoId}")
+                        .Distinct()
+                        .ToListAsync();
+
+                    foreach (var grupo in grupos)
+                    {
+                        await Groups.RemoveFromGroupAsync(Context.ConnectionId, grupo);
+                    }
+                }
+
+                await base.OnDisconnectedAsync(exception);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error en OnDisconnectedAsync: {ex.Message}");
+                await base.OnDisconnectedAsync(exception);
+            }
         }
 
         public async Task UnirseAGrupo(int grupoId)
