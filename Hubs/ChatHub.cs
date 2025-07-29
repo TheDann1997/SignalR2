@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR;
 using SignalR.Data;
 using SignalR.Models;
 using System;
@@ -461,9 +461,9 @@ namespace SignalR.Hubs
                 // Unirse al grupo de SignalR
                 await Groups.AddToGroupAsync(Context.ConnectionId, $"sala_{salaIdInt}");
 
-                // Notificar a otros participantes que se unió alguien nuevo
+                // Notificar a otros participantes que hay un nuevo usuario (sin oferta)
                 await Clients.OthersInGroup($"sala_{salaIdInt}")
-                    .SendAsync("UsuarioUnidoASala", salaIdInt.ToString(), userId, "");
+                    .SendAsync("NuevoUsuarioEnSala", salaIdInt.ToString(), userId);
 
                 // Enviar lista de participantes existentes al nuevo usuario
                 var participantesActivos = sala.Participantes
