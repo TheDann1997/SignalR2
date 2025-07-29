@@ -340,7 +340,8 @@
 
       try {
         signalRConnection = new signalR.HubConnectionBuilder()
-          .withUrl(`http://localhost:5127/chathub?userId=${userId}`)
+          .withUrl(`https://signalr2.onrender.com/chathub?userId=${userId}`)
+		  <!-- .withUrl(`http://localhost:5127/chathub?userId=${userId}`) -->
           .configureLogging(signalR.LogLevel.Information)
           .build();
 
