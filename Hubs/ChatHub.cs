@@ -124,31 +124,27 @@ namespace SignalR.Hubs
 
         public override async Task OnConnectedAsync()
         {
-            // Obtener userId desde la query string
-            var httpContext = Context.GetHttpContext();
-            var userIdString = httpContext.Request.Query["userId"];
-
-            if (int.TryParse(userIdString, out int userId))
+            try
             {
-                // 👉 Unirse a grupo individual para mensajes directos
-                await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{userId}");
-                Console.WriteLine($"Usuario {userId} conectado a grupo individual user_{userId}");
-
-                // 👉 Buscar grupos en la base de datos
-                var grupos = _context.UsuariosGrupos
-                    .Where(ug => ug.UsuarioId == userId)
-                    .Select(ug => ug.GrupoId)
-                    .ToList();
-
-                foreach (var grupoId in grupos)
+                var httpContext = Context.GetHttpContext();
+                var userId = httpContext?.Request.Query["userId"].ToString();
+                
+                Console.WriteLine($"🔗 Usuario conectado: {userId} (ConnectionId: {Context.ConnectionId})");
+                Console.WriteLine($"🔑 Context.UserIdentifier: {Context.UserIdentifier}");
+                
+                if (!string.IsNullOrEmpty(userId))
                 {
-                    string nombreGrupo = $"grupo_{grupoId}";
-                    await Groups.AddToGroupAsync(Context.ConnectionId, nombreGrupo);
-                    Console.WriteLine($"Usuario {userId} unido a grupo {nombreGrupo}");
+                    // Guardar el userId en el contexto para uso posterior
+                    Context.Items["userId"] = userId;
                 }
-            }
 
-            await base.OnConnectedAsync();
+                await base.OnConnectedAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error en OnConnectedAsync: {ex.Message}");
+                await base.OnConnectedAsync();
+            }
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
@@ -548,14 +544,18 @@ namespace SignalR.Hubs
 
         public async Task EnviarOfertaSala(string salaId, string destinatarioId, string ofertaSDP)
         {
-            await Clients.Group($"sala_{salaId}")
-                .SendAsync("RecibirOfertaSala", salaId, destinatarioId, ofertaSDP);
+            Console.WriteLine($"📤 Enviando oferta de {Context.UserIdentifier} a {destinatarioId} en sala {salaId}");
+            // Enviar solo al destinatario específico, no a todo el grupo
+            await Clients.User(destinatarioId).SendAsync("RecibirOfertaSala", salaId, Context.UserIdentifier, ofertaSDP);
+            Console.WriteLine($"✅ Oferta enviada de {Context.UserIdentifier} a {destinatarioId}");
         }
 
         public async Task EnviarRespuestaSala(string salaId, string destinatarioId, string respuestaSDP)
         {
-            await Clients.Group($"sala_{salaId}")
-                .SendAsync("RecibirRespuestaSala", salaId, destinatarioId, respuestaSDP);
+            Console.WriteLine($"📤 Enviando respuesta de {Context.UserIdentifier} a {destinatarioId} en sala {salaId}");
+            // Enviar solo al destinatario específico, no a todo el grupo
+            await Clients.User(destinatarioId).SendAsync("RecibirRespuestaSala", salaId, Context.UserIdentifier, respuestaSDP);
+            Console.WriteLine($"✅ Respuesta enviada de {Context.UserIdentifier} a {destinatarioId}");
         }
 
         public async Task ObtenerParticipantesSala(string salaId)
@@ -580,6 +580,7 @@ namespace SignalR.Hubs
                     })
                     .ToListAsync();
 
+                Console.WriteLine($"📋 Enviando lista de {participantes.Count} participantes a {Context.UserIdentifier}");
                 await Clients.Caller.SendAsync("ListaParticipantes", salaIdInt.ToString(), participantes);
             }
             catch (Exception ex)
@@ -590,8 +591,18 @@ namespace SignalR.Hubs
 
         public async Task EnviarIceCandidateSala(string salaId, string destinatarioId, string candidato)
         {
-            await Clients.Group($"sala_{salaId}")
-                .SendAsync("RecibirIceCandidateSala", salaId, destinatarioId, candidato);
+            Console.WriteLine($"🧊 Enviando candidato ICE de {Context.UserIdentifier} a {destinatarioId} en sala {salaId}");
+            // Enviar solo al destinatario específico, no a todo el grupo
+            await Clients.User(destinatarioId).SendAsync("RecibirIceCandidateSala", salaId, Context.UserIdentifier, candidato);
+            Console.WriteLine($"✅ Candidato ICE enviado de {Context.UserIdentifier} a {destinatarioId}");
+        }
+
+        // Método de debug para probar comunicación directa
+        public async Task DebugEnviarMensaje(string destinatarioId, string mensaje)
+        {
+            Console.WriteLine($"🐛 Debug: Enviando mensaje de {Context.UserIdentifier} a {destinatarioId}: {mensaje}");
+            await Clients.User(destinatarioId).SendAsync("DebugRecibirMensaje", Context.UserIdentifier, mensaje);
+            Console.WriteLine($"✅ Debug: Mensaje enviado");
         }
     }
 } 

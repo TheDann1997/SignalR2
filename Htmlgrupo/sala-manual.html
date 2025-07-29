@@ -255,6 +255,9 @@
         <button class="btn btn-primary" id="joinSalaBtn">
           <i class="ph ph-sign-in"></i> Unirse a Sala
         </button>
+        <button class="btn btn-danger" id="debugBtn">
+          <i class="ph ph-bug"></i> Debug Comunicación
+        </button>
       </div>
       
       <div id="statusDiv" class="status disconnected">
@@ -320,6 +323,7 @@
     const toggleMic = document.getElementById('toggleMic');
     const toggleScreen = document.getElementById('toggleScreen');
     const endCallBtn = document.getElementById('endCallBtn');
+    const debugBtn = document.getElementById('debugBtn');
 
     // Función para actualizar estado
     function updateStatus(message, type = 'warning') {
@@ -403,6 +407,10 @@
         signalRConnection.on("SalaEliminada", (salaId) => {
           console.log(`Sala ${salaId} fue eliminada`);
           leaveRoom();
+        });
+
+        signalRConnection.on("DebugRecibirMensaje", (remitenteId, mensaje) => {
+          console.log(`🐛 Debug: Recibido mensaje de ${remitenteId}: ${mensaje}`);
         });
 
         await signalRConnection.start();
@@ -497,12 +505,14 @@
 
     // Crear conexión peer
     function createPeerConnection(userId) {
+      console.log(`🔗 Creando conexión peer para ${userId}`);
       const pc = new RTCPeerConnection({
         iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
       });
 
       pc.onicecandidate = event => {
         if (event.candidate) {
+          console.log(`🧊 Enviando candidato ICE a ${userId}`);
           signalRConnection.invoke("EnviarIceCandidateSala", salaId, userId, JSON.stringify(event.candidate));
         }
       };
@@ -510,26 +520,43 @@
       pc.ontrack = event => {
         console.log(`🎬 Recibido stream de ${userId}`, event.streams);
         if (event.streams && event.streams.length > 0) {
-          const videoElement = createVideoElement(userId, `Usuario ${userId}`);
-          videoElement.srcObject = event.streams[0];
-          participants.set(userId, {
-            name: `Usuario ${userId}`,
-            stream: event.streams[0],
-            videoElement: videoElement,
-            pc: pc
-          });
-          console.log(`✅ Video creado para ${userId}`);
-          updateParticipantsList();
+          // Verificar si ya existe este participante
+          if (participants.has(userId)) {
+            console.log(`⚠️ Participante ${userId} ya existe, actualizando stream`);
+            const participante = participants.get(userId);
+            participante.videoElement.srcObject = event.streams[0];
+            participante.stream = event.streams[0];
+          } else {
+            console.log(`✅ Agregando nuevo participante ${userId}`);
+            const videoElement = createVideoElement(userId, `Usuario ${userId}`);
+            videoElement.srcObject = event.streams[0];
+            participants.set(userId, {
+              name: `Usuario ${userId}`,
+              stream: event.streams[0],
+              videoElement: videoElement,
+              pc: pc
+            });
+            updateParticipantsList();
+          }
         } else {
           console.warn(`⚠️ No hay streams en el evento ontrack de ${userId}`);
         }
       };
 
       pc.onconnectionstatechange = () => {
+        console.log(`🔗 Estado de conexión con ${userId}: ${pc.connectionState}`);
         if (["disconnected", "closed", "failed"].includes(pc.connectionState)) {
-          console.log(`Conexión con ${userId} perdida`);
+          console.log(`❌ Conexión con ${userId} perdida`);
           removeParticipant(userId);
         }
+      };
+
+      pc.oniceconnectionstatechange = () => {
+        console.log(`🧊 Estado ICE con ${userId}: ${pc.iceConnectionState}`);
+      };
+
+      pc.onsignalingstatechange = () => {
+        console.log(`📡 Estado de señalización con ${userId}: ${pc.signalingState}`);
       };
 
       return pc;
@@ -537,6 +564,14 @@
 
     // Crear elemento de video
     function createVideoElement(userId, name) {
+      // Verificar si ya existe un video para este usuario
+      const existingContainer = document.getElementById(`video-${userId}`);
+      if (existingContainer) {
+        console.log(`⚠️ Video ya existe para ${userId}, reutilizando`);
+        return existingContainer.querySelector('video');
+      }
+
+      console.log(`🎬 Creando nuevo video para ${userId}`);
       const container = document.createElement('div');
       container.className = 'video-container';
       container.id = `video-${userId}`;
@@ -599,17 +634,34 @@
 
     // Manejar respuesta
     async function handleAnswer(userId, respuestaSDP) {
+      console.log(`📥 Recibida respuesta de ${userId}, procesando...`);
       const pc = peerConnections.get(userId);
       if (pc) {
-        await pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(respuestaSDP)));
+        try {
+          console.log(`🔄 Estableciendo descripción remota (respuesta) para ${userId}`);
+          await pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(respuestaSDP)));
+          console.log(`✅ Respuesta procesada correctamente para ${userId}`);
+        } catch (err) {
+          console.error(`❌ Error procesando respuesta de ${userId}:`, err);
+        }
+      } else {
+        console.warn(`⚠️ No se encontró conexión peer para ${userId} al procesar respuesta`);
       }
     }
 
     // Manejar candidato ICE
     async function handleIceCandidate(userId, candidato) {
+      console.log(`🧊 Recibido candidato ICE de ${userId}`);
       const pc = peerConnections.get(userId);
       if (pc && pc.remoteDescription) {
-        await pc.addIceCandidate(new RTCIceCandidate(JSON.parse(candidato)));
+        try {
+          await pc.addIceCandidate(new RTCIceCandidate(JSON.parse(candidato)));
+          console.log(`✅ Candidato ICE agregado para ${userId}`);
+        } catch (err) {
+          console.error(`❌ Error agregando candidato ICE de ${userId}:`, err);
+        }
+      } else {
+        console.warn(`⚠️ No se puede agregar candidato ICE para ${userId} - conexión no lista`);
       }
     }
 
@@ -714,6 +766,7 @@
 
     // Actualizar lista de participantes desde el servidor
     function actualizarListaParticipantes(participantes) {
+      console.log(`📋 Actualizando lista de participantes:`, participantes);
       participantsContainer.innerHTML = '';
       
       // Agregar participante local
@@ -725,9 +778,11 @@
       `;
       participantsContainer.appendChild(localItem);
 
-      // Agregar participantes del servidor
+      // Agregar participantes del servidor (excluyendo al usuario local)
+      const participantesUnicos = new Set();
       participantes.forEach(participante => {
-        if (participante.UsuarioId !== localUserId) {
+        if (participante.UsuarioId !== localUserId && !participantesUnicos.has(participante.UsuarioId)) {
+          participantesUnicos.add(participante.UsuarioId);
           const item = document.createElement('div');
           item.className = 'participant-item';
           item.innerHTML = `
@@ -735,14 +790,31 @@
             <span>Usuario ${participante.UsuarioId}</span>
           `;
           participantsContainer.appendChild(item);
+          console.log(`👤 Agregado participante: ${participante.UsuarioId}`);
         }
       });
+      
+      console.log(`📊 Total participantes en lista: ${participantesUnicos.size + 1} (incluyendo local)`);
     }
 
     // Event listeners
     connectBtn.addEventListener('click', connectToSignalR);
     createSalaBtn.addEventListener('click', createSala);
     joinSalaBtn.addEventListener('click', joinSala);
+    debugBtn.addEventListener('click', debugComunicacion);
+
+    // Función de debug para probar comunicación
+    async function debugComunicacion() {
+      const otroUserId = prompt('Ingresa el ID del otro usuario para probar comunicación:');
+      if (otroUserId && signalRConnection && signalRConnection.state === "Connected") {
+        try {
+          await signalRConnection.invoke("DebugEnviarMensaje", otroUserId, `Hola desde ${localUserId} a las ${new Date().toLocaleTimeString()}`);
+          console.log(`🐛 Debug: Mensaje enviado a ${otroUserId}`);
+        } catch (err) {
+          console.error('Error en debug:', err);
+        }
+      }
+    }
 
     // Evento para cuando se cierra la página
     window.addEventListener('beforeunload', () => {
