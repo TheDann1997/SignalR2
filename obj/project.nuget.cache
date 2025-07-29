@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Gp0AFJ2dLrE=",
+  "dgSpecHash": "wbS+p0pJDSo=",
   "success": true,
-  "projectFilePath": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\SignalR.csproj",
+  "projectFilePath": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\SignalR.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\daniel.agudelo\\.nuget\\packages\\microsoft.entityframeworkcore\\7.0.5\\microsoft.entityframeworkcore.7.0.5.nupkg.sha512",
     "C:\\Users\\daniel.agudelo\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\7.0.5\\microsoft.entityframeworkcore.abstractions.7.0.5.nupkg.sha512",

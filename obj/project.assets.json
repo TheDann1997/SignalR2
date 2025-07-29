@@ -1112,11 +1112,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\SignalR.csproj",
+      "projectUniqueName": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\SignalR.csproj",
       "projectName": "SignalR",
-      "projectPath": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\SignalR.csproj",
+      "projectPath": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\SignalR.csproj",
       "packagesPath": "C:\\Users\\daniel.agudelo\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2\\obj\\",
+      "outputPath": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

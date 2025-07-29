@@ -32,6 +32,128 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "SignalR.Controllers.LimpiezaController",
+    "Method": "ObtenerEstadisticas",
+    "RelativePath": "api/Limpieza/estadisticas",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SignalR.Controllers.LimpiezaController",
+    "Method": "LimpiarDatosAntiguos",
+    "RelativePath": "api/Limpieza/limpiar-datos-antiguos",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "diasRetencion",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SignalR.Controllers.LlamadasGrupalesController",
+    "Method": "ActualizarEstado",
+    "RelativePath": "api/LlamadasGrupales/estado",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "SignalR.Controllers.ActualizarEstadoRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SignalR.Controllers.LlamadasGrupalesController",
+    "Method": "GetLlamadaActiva",
+    "RelativePath": "api/LlamadasGrupales/grupo/{grupoId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "grupoId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SignalR.Controllers.LlamadasGrupalesController",
+    "Method": "IniciarLlamada",
+    "RelativePath": "api/LlamadasGrupales/iniciar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "SignalR.Controllers.IniciarLlamadaRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SignalR.Controllers.LlamadasGrupalesController",
+    "Method": "GetParticipantes",
+    "RelativePath": "api/LlamadasGrupales/participantes/{llamadaId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "llamadaId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SignalR.Controllers.LlamadasGrupalesController",
+    "Method": "SalirDeLlamada",
+    "RelativePath": "api/LlamadasGrupales/salir",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "SignalR.Controllers.SalirLlamadaRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SignalR.Controllers.LlamadasGrupalesController",
+    "Method": "UnirseALlamada",
+    "RelativePath": "api/LlamadasGrupales/unirse",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "SignalR.Controllers.UnirseLlamadaRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "SignalR.Controllers.WeatherForecastController",
     "Method": "Get",
     "RelativePath": "WeatherForecast",

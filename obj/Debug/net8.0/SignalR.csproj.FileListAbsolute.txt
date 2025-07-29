@@ -36,3 +36,41 @@ C:\Users\daniel.agudelo\Desktop\SignalR2\obj\Debug\net8.0\SignalR.pdb
 C:\Users\daniel.agudelo\Desktop\SignalR2\obj\Debug\net8.0\SignalR.genruntimeconfig.cache
 C:\Users\daniel.agudelo\Desktop\SignalR2\obj\Debug\net8.0\ref\SignalR.dll
 C:\Users\daniel.agudelo\Desktop\SignalR2\bin\Debug\net8.0\uploads\bb6fbe42-5d65-475e-b28e-5d7fbab4842e_package.json
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\bin\Debug\net8.0\appsettings.Development.json
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\bin\Debug\net8.0\appsettings.json
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\bin\Debug\net8.0\uploads\bb6fbe42-5d65-475e-b28e-5d7fbab4842e_package.json
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\bin\Debug\net8.0\SignalR.staticwebassets.endpoints.json
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\bin\Debug\net8.0\SignalR.exe
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\bin\Debug\net8.0\SignalR.deps.json
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\bin\Debug\net8.0\SignalR.runtimeconfig.json
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\bin\Debug\net8.0\SignalR.dll
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\bin\Debug\net8.0\SignalR.pdb
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\bin\Debug\net8.0\Microsoft.OpenApi.dll
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\bin\Debug\net8.0\MySqlConnector.dll
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\bin\Debug\net8.0\Pomelo.EntityFrameworkCore.MySql.dll
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\SignalR.csproj.AssemblyReference.cache
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\SignalR.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\SignalR.AssemblyInfoInputs.cache
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\SignalR.AssemblyInfo.cs
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\SignalR.csproj.CoreCompileInputs.cache
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\SignalR.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\SignalR.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\SignalR.sourcelink.json
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\scopedcss\bundle\SignalR.styles.css
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\staticwebassets.build.json
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\staticwebassets.build.json.cache
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\staticwebassets.development.json
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\SignalR.csproj.Up2Date
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\SignalR.dll
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\refint\SignalR.dll
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\SignalR.pdb
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\SignalR.genruntimeconfig.cache
+C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\ref\SignalR.dll

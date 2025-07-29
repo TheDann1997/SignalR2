@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sala de Videollamada Manual</title>
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .setup-panel {
+      background: rgba(255,255,255,0.95);
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .setup-panel h2 {
+      color: #333;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .input-group {
+      margin-bottom: 15px;
+    }
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #555;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    .input-group input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: bold;
+    }
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #5a6fd8;
+      transform: translateY(-2px);
+    }
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #218838;
+      transform: translateY(-2px);
+    }
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+    .btn-danger:hover {
+      background: #c82333;
+      transform: translateY(-2px);
+    }
+    .status {
+      text-align: center;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+    .status.connected {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .status.disconnected {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .status.warning {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+    }
+    
+    /* Estilos para la sala de video */
+    .video-room {
+      display: none;
+      background: rgba(255,255,255,0.95);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .video-room.active {
+      display: block;
+    }
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .video-container {
+      background: #000;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      aspect-ratio: 16/9;
+    }
+    .video-container video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .participant-name {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 12px;
+    }
+    .controls-bar {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .control-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .control-btn.camera {
+      background: #28a745;
+      color: white;
+    }
+    .control-btn.camera.muted {
+      background: #dc3545;
+    }
+    .control-btn.mic {
+      background: #28a745;
+      color: white;
+    }
+    .control-btn.mic.muted {
+      background: #dc3545;
+    }
+    .control-btn.screen {
+      background: #17a2b8;
+      color: white;
+    }
+    .control-btn.end-call {
+      background: #dc3545;
+      color: white;
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+    }
+    .participants-list {
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+    .participants-list h4 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    .participant-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 5px 0;
+      padding: 5px;
+      border-radius: 5px;
+      background: rgba(255,255,255,0.1);
+    }
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #28a745;
+    }
+    .status-indicator.muted {
+      background: #ffc107;
+    }
+    .status-indicator.offline {
+      background: #dc3545;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Panel de configuración -->
+    <div class="setup-panel" id="setupPanel">
+      <h2>🎥 Sala de Videollamada Manual</h2>
+      
+      <div class="input-group">
+        <label for="userIdInput">Tu ID de Usuario:</label>
+        <input type="text" id="userIdInput" placeholder="Ej: 123" />
+      </div>
+      
+      <div class="input-group">
+        <label for="salaIdInput">ID de la Sala:</label>
+        <input type="number" id="salaIdInput" placeholder="Ej: 1, 2, 3, etc." />
+      </div>
+      
+      <div class="button-group">
+        <button class="btn btn-primary" id="connectBtn">
+          <i class="ph ph-plug"></i> Conectar
+        </button>
+        <button class="btn btn-success" id="createSalaBtn">
+          <i class="ph ph-plus"></i> Crear Sala
+        </button>
+        <button class="btn btn-primary" id="joinSalaBtn">
+          <i class="ph ph-sign-in"></i> Unirse a Sala
+        </button>
+      </div>
+      
+      <div id="statusDiv" class="status disconnected">
+        Desconectado
+      </div>
+    </div>
+
+    <!-- Sala de video -->
+    <div class="video-room" id="videoRoom">
+      <h3>Sala: <span id="currentSalaName"></span></h3>
+      
+      <div class="video-grid" id="videoGrid">
+        <!-- Los videos se agregarán dinámicamente aquí -->
+      </div>
+      
+      <div class="controls-bar">
+        <button class="control-btn camera" id="toggleCamera" title="Cámara">
+          <i class="ph ph-camera"></i>
+        </button>
+        <button class="control-btn mic" id="toggleMic" title="Micrófono">
+          <i class="ph ph-microphone"></i>
+        </button>
+        <button class="control-btn screen" id="toggleScreen" title="Compartir Pantalla">
+          <i class="ph ph-monitor"></i>
+        </button>
+        <button class="control-btn end-call" id="endCallBtn" title="Terminar Llamada">
+          <i class="ph ph-phone-disconnect"></i>
+        </button>
+      </div>
+      
+      <div class="participants-list">
+        <h4>👥 Participantes</h4>
+        <div id="participantsContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Variables globales
+    let signalRConnection = null;
+    let localUserId = null;
+    let salaId = null;
+    let localStream = null;
+    let screenStream = null;
+    let isScreenSharing = false;
+    let peerConnections = new Map(); // userId -> RTCPeerConnection
+    let participants = new Map(); // userId -> {name, stream, videoElement, etc}
+    let localVideoElement = null;
+
+    // Elementos DOM
+    const setupPanel = document.getElementById('setupPanel');
+    const videoRoom = document.getElementById('videoRoom');
+    const userIdInput = document.getElementById('userIdInput');
+    const salaIdInput = document.getElementById('salaIdInput');
+    const connectBtn = document.getElementById('connectBtn');
+    const createSalaBtn = document.getElementById('createSalaBtn');
+    const joinSalaBtn = document.getElementById('joinSalaBtn');
+    const statusDiv = document.getElementById('statusDiv');
+    const currentSalaName = document.getElementById('currentSalaName');
+    const videoGrid = document.getElementById('videoGrid');
+    const participantsContainer = document.getElementById('participantsContainer');
+    const toggleCamera = document.getElementById('toggleCamera');
+    const toggleMic = document.getElementById('toggleMic');
+    const toggleScreen = document.getElementById('toggleScreen');
+    const endCallBtn = document.getElementById('endCallBtn');
+
+    // Función para actualizar estado
+    function updateStatus(message, type = 'warning') {
+      statusDiv.textContent = message;
+      statusDiv.className = `status ${type}`;
+    }
+
+    // Conectar a SignalR
+    async function connectToSignalR() {
+      const userId = userIdInput.value.trim();
+      if (!userId) {
+        updateStatus('Por favor ingresa tu ID de usuario', 'disconnected');
+        return;
+      }
+
+      localUserId = userId;
+      updateStatus('Conectando...', 'warning');
+
+      try {
+        signalRConnection = new signalR.HubConnectionBuilder()
+          .withUrl(`http://localhost:5127/chathub?userId=${userId}`)
+          .configureLogging(signalR.LogLevel.Information)
+          .build();
+
+        // Eventos para salas manuales
+        signalRConnection.on("SalaCreada", (salaId, creador) => {
+          console.log(`Sala ${salaId} creada por ${creador}`);
+          updateStatus(`Sala ${salaId} creada exitosamente`, 'connected');
+          // Entrar automáticamente a la sala creada
+          enterRoom(salaId);
+        });
+
+        signalRConnection.on("ErrorSala", (mensaje) => {
+          console.error(`Error en sala: ${mensaje}`);
+          updateStatus(`Error: ${mensaje}`, 'disconnected');
+        });
+
+        signalRConnection.on("UsuarioUnidoASala", (salaId, userId, ofertaSDP) => {
+          console.log(`Usuario ${userId} se unió a la sala ${salaId}`);
+          handleUserJoined(userId, ofertaSDP);
+        });
+
+        signalRConnection.on("ParticipanteExistente", (salaId, userId) => {
+          console.log(`Participante existente: ${userId} en sala ${salaId}`);
+          // Aquí podrías manejar participantes existentes
+        });
+
+        signalRConnection.on("ListaParticipantes", (salaId, participantes) => {
+          console.log(`Lista de participantes en sala ${salaId}:`, participantes);
+          // Actualizar lista de participantes en la UI
+        });
+
+        signalRConnection.on("RecibirOfertaSala", (salaId, userId, ofertaSDP) => {
+          console.log(`Recibida oferta de ${userId} en sala ${salaId}`);
+          handleOffer(userId, ofertaSDP);
+        });
+
+        signalRConnection.on("RecibirRespuestaSala", (salaId, userId, respuestaSDP) => {
+          console.log(`Recibida respuesta de ${userId} en sala ${salaId}`);
+          handleAnswer(userId, respuestaSDP);
+        });
+
+        signalRConnection.on("RecibirIceCandidateSala", (salaId, userId, candidato) => {
+          console.log(`Recibido candidato ICE de ${userId} en sala ${salaId}`);
+          handleIceCandidate(userId, candidato);
+        });
+
+        signalRConnection.on("UsuarioSalioDeSala", (salaId, userId) => {
+          console.log(`Usuario ${userId} salió de la sala ${salaId}`);
+          removeParticipant(userId);
+        });
+
+        signalRConnection.on("SalaEliminada", (salaId) => {
+          console.log(`Sala ${salaId} fue eliminada`);
+          leaveRoom();
+        });
+
+        await signalRConnection.start();
+        updateStatus('Conectado a SignalR', 'connected');
+        
+        // Habilitar botones
+        createSalaBtn.disabled = false;
+        joinSalaBtn.disabled = false;
+        
+      } catch (err) {
+        console.error('Error conectando a SignalR:', err);
+        updateStatus('Error de conexión: ' + err.message, 'disconnected');
+      }
+    }
+
+    // Crear sala
+    async function createSala() {
+      const salaIdInput = document.getElementById('salaIdInput');
+      const salaId = salaIdInput.value.trim();
+      
+      if (!salaId) {
+        updateStatus('Por favor ingresa un ID para la sala', 'warning');
+        return;
+      }
+
+      if (!signalRConnection || signalRConnection.state !== "Connected") {
+        updateStatus('Primero debes conectarte', 'disconnected');
+        return;
+      }
+
+      try {
+        await signalRConnection.invoke("CrearSala", salaId, localUserId);
+        updateStatus(`Creando sala ${salaId}...`, 'warning');
+      } catch (err) {
+        console.error('Error creando sala:', err);
+        updateStatus('Error creando sala: ' + err.message, 'disconnected');
+      }
+    }
+
+    // Unirse a sala
+    async function joinSala() {
+      const salaIdInput = document.getElementById('salaIdInput');
+      const salaId = salaIdInput.value.trim();
+      
+      if (!salaId) {
+        updateStatus('Por favor ingresa el ID de la sala', 'warning');
+        return;
+      }
+
+      if (!signalRConnection || signalRConnection.state !== "Connected") {
+        updateStatus('Primero debes conectarte', 'disconnected');
+        return;
+      }
+
+      try {
+        await signalRConnection.invoke("UnirseASala", salaId, localUserId);
+        enterRoom(salaId);
+      } catch (err) {
+        console.error('Error uniéndose a sala:', err);
+        updateStatus('Error uniéndose a sala: ' + err.message, 'disconnected');
+      }
+    }
+
+    // Entrar a la sala
+    async function enterRoom(salaId) {
+      salaId = salaId;
+      currentSalaName.textContent = salaId;
+      
+      try {
+        // Obtener stream local
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        
+        // Crear video local
+        localVideoElement = createVideoElement(localUserId, 'Tú');
+        localVideoElement.srcObject = localStream;
+        localVideoElement.muted = true; // Silenciar audio local
+
+        // Mostrar sala
+        setupPanel.style.display = 'none';
+        videoRoom.classList.add('active');
+        
+        updateStatus(`En sala: ${salaId}`, 'connected');
+        
+      } catch (err) {
+        console.error('Error obteniendo medios:', err);
+        updateStatus('Error accediendo a cámara/micrófono: ' + err.message, 'disconnected');
+      }
+    }
+
+    // Crear conexión peer
+    function createPeerConnection(userId) {
+      const pc = new RTCPeerConnection({
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+      });
+
+      pc.onicecandidate = event => {
+        if (event.candidate) {
+          signalRConnection.invoke("EnviarIceCandidateSala", salaId, userId, JSON.stringify(event.candidate));
+        }
+      };
+
+      pc.ontrack = event => {
+        console.log(`Recibido stream de ${userId}`);
+        const videoElement = createVideoElement(userId, `Usuario ${userId}`);
+        videoElement.srcObject = event.streams[0];
+        participants.set(userId, {
+          name: `Usuario ${userId}`,
+          stream: event.streams[0],
+          videoElement: videoElement,
+          pc: pc
+        });
+        updateParticipantsList();
+      };
+
+      pc.onconnectionstatechange = () => {
+        if (["disconnected", "closed", "failed"].includes(pc.connectionState)) {
+          console.log(`Conexión con ${userId} perdida`);
+          removeParticipant(userId);
+        }
+      };
+
+      return pc;
+    }
+
+    // Crear elemento de video
+    function createVideoElement(userId, name) {
+      const container = document.createElement('div');
+      container.className = 'video-container';
+      container.id = `video-${userId}`;
+
+      const video = document.createElement('video');
+      video.autoplay = true;
+      video.playsinline = true;
+
+      const nameDiv = document.createElement('div');
+      nameDiv.className = 'participant-name';
+      nameDiv.textContent = name;
+
+      container.appendChild(video);
+      container.appendChild(nameDiv);
+      videoGrid.appendChild(container);
+
+      return video;
+    }
+
+    // Manejar usuario unido
+    async function handleUserJoined(userId, ofertaSDP) {
+      const pc = createPeerConnection(userId);
+      peerConnections.set(userId, pc);
+
+      if (localStream) {
+        localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+      }
+
+      await pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(ofertaSDP)));
+      const respuesta = await pc.createAnswer();
+      await pc.setLocalDescription(respuesta);
+
+      signalRConnection.invoke("EnviarRespuestaSala", salaId, userId, JSON.stringify(respuesta));
+    }
+
+    // Manejar oferta
+    async function handleOffer(userId, ofertaSDP) {
+      let pc = peerConnections.get(userId);
+      if (!pc) {
+        pc = createPeerConnection(userId);
+        peerConnections.set(userId, pc);
+
+        if (localStream) {
+          localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+        }
+      }
+
+      await pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(ofertaSDP)));
+      const respuesta = await pc.createAnswer();
+      await pc.setLocalDescription(respuesta);
+
+      signalRConnection.invoke("EnviarRespuestaSala", salaId, userId, JSON.stringify(respuesta));
+    }
+
+    // Manejar respuesta
+    async function handleAnswer(userId, respuestaSDP) {
+      const pc = peerConnections.get(userId);
+      if (pc) {
+        await pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(respuestaSDP)));
+      }
+    }
+
+    // Manejar candidato ICE
+    async function handleIceCandidate(userId, candidato) {
+      const pc = peerConnections.get(userId);
+      if (pc && pc.remoteDescription) {
+        await pc.addIceCandidate(new RTCIceCandidate(JSON.parse(candidato)));
+      }
+    }
+
+    // Remover participante
+    function removeParticipant(userId) {
+      const pc = peerConnections.get(userId);
+      if (pc) {
+        pc.close();
+        peerConnections.delete(userId);
+      }
+
+      const participante = participants.get(userId);
+      if (participante && participante.videoElement) {
+        const container = participante.videoElement.parentElement;
+        if (container) {
+          container.remove();
+        }
+      }
+      participants.delete(userId);
+      updateParticipantsList();
+    }
+
+    // Salir de la sala
+    function leaveRoom() {
+      // Cerrar todas las conexiones peer
+      for (const [userId, pc] of peerConnections) {
+        pc.close();
+      }
+      peerConnections.clear();
+
+      // Detener stream local
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+      }
+
+      // Limpiar videos
+      videoGrid.innerHTML = '';
+      participants.clear();
+      updateParticipantsList();
+
+      // Mostrar panel de configuración
+      videoRoom.classList.remove('active');
+      setupPanel.style.display = 'block';
+      
+      updateStatus('Desconectado de la sala', 'disconnected');
+    }
+
+    // Actualizar lista de participantes
+    function updateParticipantsList() {
+      participantsContainer.innerHTML = '';
+      
+      // Agregar participante local
+      const localItem = document.createElement('div');
+      localItem.className = 'participant-item';
+      localItem.innerHTML = `
+        <div class="status-indicator"></div>
+        <span>Tú (${localUserId})</span>
+      `;
+      participantsContainer.appendChild(localItem);
+
+      // Agregar participantes remotos
+      for (const [userId, participante] of participants) {
+        const item = document.createElement('div');
+        item.className = 'participant-item';
+        item.innerHTML = `
+          <div class="status-indicator"></div>
+          <span>${participante.name}</span>
+        `;
+        participantsContainer.appendChild(item);
+      }
+    }
+
+    // Event listeners
+    connectBtn.addEventListener('click', connectToSignalR);
+    createSalaBtn.addEventListener('click', createSala);
+    joinSalaBtn.addEventListener('click', joinSala);
+
+    toggleCamera.addEventListener('click', () => {
+      if (localStream) {
+        const videoTrack = localStream.getVideoTracks()[0];
+        if (videoTrack) {
+          videoTrack.enabled = !videoTrack.enabled;
+          toggleCamera.classList.toggle('muted', !videoTrack.enabled);
+        }
+      }
+    });
+
+    toggleMic.addEventListener('click', () => {
+      if (localStream) {
+        const audioTrack = localStream.getAudioTracks()[0];
+        if (audioTrack) {
+          audioTrack.enabled = !audioTrack.enabled;
+          toggleMic.classList.toggle('muted', !audioTrack.enabled);
+        }
+      }
+    });
+
+    endCallBtn.addEventListener('click', leaveRoom);
+
+    // Inicialización
+    console.log('Sala de videollamada manual cargada');
+    updateStatus('Listo para conectar', 'disconnected');
+  </script>
+</body>
+</html> 

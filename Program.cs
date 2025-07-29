@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using SignalR.Data;
 using SignalR.Hubs;
+using SignalR.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,9 @@ builder.Services.Configure<FormOptions>(options =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
     new MySqlServerVersion(new Version(8, 0, 36))));
+
+// Servicio de limpieza automática
+builder.Services.AddHostedService<LimpiezaLlamadasService>();
 
 // Kestrel - límite de tamaño
 builder.WebHost.ConfigureKestrel(serverOptions =>
