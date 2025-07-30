@@ -1,8 +1,14 @@
 {
   "version": 2,
+<<<<<<< Updated upstream
   "dgSpecHash": "r39H6fs/UsE=",
   "success": true,
   "projectFilePath": "D:\\SignalR2\\SignalR.csproj",
+=======
+  "dgSpecHash": "wbS+p0pJDSo=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\SignalR.csproj",
+>>>>>>> Stashed changes
   "expectedPackageFiles": [
     "C:\\Users\\agudelod\\.nuget\\packages\\microsoft.entityframeworkcore\\7.0.5\\microsoft.entityframeworkcore.7.0.5.nupkg.sha512",
     "C:\\Users\\agudelod\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\7.0.5\\microsoft.entityframeworkcore.abstractions.7.0.5.nupkg.sha512",

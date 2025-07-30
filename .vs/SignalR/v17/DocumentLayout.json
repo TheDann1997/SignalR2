@@ -1,5 +1,6 @@
 {
   "Version": 1,
+<<<<<<< Updated upstream
   "WorkspaceRootPath": "D:\\SignalR2\\",
   "Documents": [
     {
@@ -36,6 +37,40 @@
     },
     {
       "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|d:\\signalr2\\signalr.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+=======
+  "WorkspaceRootPath": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2 - cursor\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2 - cursor\\hubs\\chathub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:hubs\\chathub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2 - cursor\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2 - cursor\\models\\mensaje.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:models\\mensaje.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2 - cursor\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2 - cursor\\controllers\\archivoscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:controllers\\archivoscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2 - cursor\\models\\usuariogrupo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:models\\usuariogrupo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|c:\\users\\daniel.agudelo\\desktop\\signalr2 - cursor\\signalr.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+>>>>>>> Stashed changes
       "RelativeMoniker": "D:0:0:{67092253-1CDE-4738-BD1D-F2AA3FFFF718}|SignalR.csproj|solutionrelative:signalr.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     }
   ],
@@ -46,6 +81,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
+<<<<<<< Updated upstream
           "SelectedChildIndex": 0,
           "Children": [
             {
@@ -59,11 +95,27 @@
               "ViewState": "AgIAAAkAAAAAAAAAAAAAABEAAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2025-07-30T20:13:51.036Z",
+=======
+          "SelectedChildIndex": 6,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ChatHub.cs",
+              "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\Hubs\\ChatHub.cs",
+              "RelativeDocumentMoniker": "Hubs\\ChatHub.cs",
+              "ToolTip": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\Hubs\\ChatHub.cs",
+              "RelativeToolTip": "Hubs\\ChatHub.cs",
+              "ViewState": "AgIAABcBAAAAAAAAAAAYwCkBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-15T15:19:05.117Z",
+>>>>>>> Stashed changes
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
+<<<<<<< Updated upstream
               "Title": "ChatHub.cs",
               "DocumentMoniker": "D:\\SignalR2\\Hubs\\ChatHub.cs",
               "RelativeDocumentMoniker": "Hubs\\ChatHub.cs",
@@ -80,6 +132,12 @@
               "DocumentMoniker": "D:\\SignalR2\\Models\\Mensaje.cs",
               "RelativeDocumentMoniker": "Models\\Mensaje.cs",
               "ToolTip": "D:\\SignalR2\\Models\\Mensaje.cs",
+=======
+              "Title": "Mensaje.cs",
+              "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\Models\\Mensaje.cs",
+              "RelativeDocumentMoniker": "Models\\Mensaje.cs",
+              "ToolTip": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\Models\\Mensaje.cs",
+>>>>>>> Stashed changes
               "RelativeToolTip": "Models\\Mensaje.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -87,11 +145,19 @@
             },
             {
               "$type": "Document",
+<<<<<<< Updated upstream
               "DocumentIndex": 6,
               "Title": "ArchivosController.cs",
               "DocumentMoniker": "D:\\SignalR2\\Controllers\\ArchivosController.cs",
               "RelativeDocumentMoniker": "Controllers\\ArchivosController.cs",
               "ToolTip": "D:\\SignalR2\\Controllers\\ArchivosController.cs",
+=======
+              "DocumentIndex": 5,
+              "Title": "ArchivosController.cs",
+              "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\Controllers\\ArchivosController.cs",
+              "RelativeDocumentMoniker": "Controllers\\ArchivosController.cs",
+              "ToolTip": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\Controllers\\ArchivosController.cs",
+>>>>>>> Stashed changes
               "RelativeToolTip": "Controllers\\ArchivosController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -99,11 +165,19 @@
             },
             {
               "$type": "Document",
+<<<<<<< Updated upstream
               "DocumentIndex": 7,
               "Title": "UsuarioGrupo.cs",
               "DocumentMoniker": "D:\\SignalR2\\Models\\UsuarioGrupo.cs",
               "RelativeDocumentMoniker": "Models\\UsuarioGrupo.cs",
               "ToolTip": "D:\\SignalR2\\Models\\UsuarioGrupo.cs",
+=======
+              "DocumentIndex": 6,
+              "Title": "UsuarioGrupo.cs",
+              "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\Models\\UsuarioGrupo.cs",
+              "RelativeDocumentMoniker": "Models\\UsuarioGrupo.cs",
+              "ToolTip": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\Models\\UsuarioGrupo.cs",
+>>>>>>> Stashed changes
               "RelativeToolTip": "Models\\UsuarioGrupo.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -111,11 +185,19 @@
             },
             {
               "$type": "Document",
+<<<<<<< Updated upstream
               "DocumentIndex": 8,
               "Title": "SignalR.csproj",
               "DocumentMoniker": "D:\\SignalR2\\SignalR.csproj",
               "RelativeDocumentMoniker": "SignalR.csproj",
               "ToolTip": "D:\\SignalR2\\SignalR.csproj",
+=======
+              "DocumentIndex": 7,
+              "Title": "SignalR.csproj",
+              "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\SignalR.csproj",
+              "RelativeDocumentMoniker": "SignalR.csproj",
+              "ToolTip": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\SignalR.csproj",
+>>>>>>> Stashed changes
               "RelativeToolTip": "SignalR.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
@@ -123,6 +205,7 @@
             },
             {
               "$type": "Document",
+<<<<<<< Updated upstream
               "DocumentIndex": 4,
               "Title": "AppDbContext.cs",
               "DocumentMoniker": "D:\\SignalR2\\Data\\AppDbContext.cs",
@@ -158,6 +241,42 @@
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-19T17:12:54.544Z",
               "EditorCaption": ""
+=======
+              "DocumentIndex": 2,
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\Data\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "Data\\AppDbContext.cs",
+              "ToolTip": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\Data\\AppDbContext.cs",
+              "RelativeToolTip": "Data\\AppDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAA0AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-06T21:00:35.075Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-07-14T21:38:08.524Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\daniel.agudelo\\Desktop\\SignalR2 - Cursor\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAC0AAAAAAAAAAAAAAFoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-19T17:12:54.544Z"
+>>>>>>> Stashed changes
             }
           ]
         }

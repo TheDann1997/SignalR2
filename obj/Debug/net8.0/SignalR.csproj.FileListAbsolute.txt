@@ -74,6 +74,7 @@ C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\refint\Signal
 C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\SignalR.pdb
 C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\SignalR.genruntimeconfig.cache
 C:\Users\daniel.agudelo\Desktop\SignalR2 - Cursor\obj\Debug\net8.0\ref\SignalR.dll
+<<<<<<< Updated upstream
 D:\SignalR2\bin\Debug\net8.0\appsettings.Development.json
 D:\SignalR2\bin\Debug\net8.0\SignalR.staticwebassets.endpoints.json
 D:\SignalR2\bin\Debug\net8.0\appsettings.json
@@ -111,3 +112,5 @@ D:\SignalR2\obj\Debug\net8.0\refint\SignalR.dll
 D:\SignalR2\obj\Debug\net8.0\SignalR.pdb
 D:\SignalR2\obj\Debug\net8.0\SignalR.genruntimeconfig.cache
 D:\SignalR2\obj\Debug\net8.0\ref\SignalR.dll
+=======
+>>>>>>> Stashed changes
