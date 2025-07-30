@@ -38,6 +38,7 @@ builder.Services.AddHostedService<LimpiezaLlamadasService>();
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.Limits.MaxRequestBodySize = 200 * 1024 * 1024;
+    serverOptions.ListenAnyIP(5127); // Puerto HTTP
 });
 
 // CORS

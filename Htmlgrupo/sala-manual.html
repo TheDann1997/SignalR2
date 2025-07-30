@@ -90,6 +90,14 @@
       background: #c82333;
       transform: translateY(-2px);
     }
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+    .btn-secondary:hover {
+      background: #5a6268;
+      transform: translateY(-2px);
+    }
     .status {
       text-align: center;
       padding: 10px;
@@ -136,11 +144,13 @@
       overflow: hidden;
       position: relative;
       aspect-ratio: 16/9;
+      display: block; /* Mostrar por defecto */
     }
     .video-container video {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
     }
     .participant-name {
       position: absolute;
@@ -188,6 +198,10 @@
       background: #17a2b8;
       color: white;
     }
+    .control-btn.screen.active {
+      background: #ffc107;
+      color: #000;
+    }
     .control-btn.end-call {
       background: #dc3545;
       color: white;
@@ -227,6 +241,27 @@
     .status-indicator.offline {
       background: #dc3545;
     }
+    
+    .participant-controls {
+      display: flex;
+      gap: 5px;
+      margin-left: auto;
+    }
+    
+    .participant-controls i {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+    
+    .participant-controls i.active {
+      opacity: 1;
+      color: #28a745;
+    }
+    
+    .participant-controls i.muted {
+      opacity: 0.5;
+      color: #dc3545;
+    }
   </style>
 </head>
 <body>
@@ -255,14 +290,8 @@
         <button class="btn btn-primary" id="joinSalaBtn">
           <i class="ph ph-sign-in"></i> Unirse a Sala
         </button>
-        <button class="btn btn-danger" id="debugBtn">
-          <i class="ph ph-bug"></i> Debug Comunicación
-        </button>
-        <button class="btn btn-warning" id="debugListBtn">
-          <i class="ph ph-list"></i> Debug Lista
-        </button>
-        <button class="btn btn-info" id="debugGrupoBtn">
-          <i class="ph ph-users"></i> Debug Grupo
+        <button class="btn btn-warning" id="debugOfertasBtn" style="display: none;">
+          <i class="ph ph-arrow-right"></i> Forzar Ofertas
         </button>
       </div>
       
@@ -281,16 +310,16 @@
       
       <div class="controls-bar">
         <button class="control-btn camera" id="toggleCamera" title="Cámara">
-          <i class="ph ph-camera"></i>
+          <i class="ph ph-camera-slash"></i>
         </button>
         <button class="control-btn mic" id="toggleMic" title="Micrófono">
-          <i class="ph ph-microphone"></i>
+          <i class="ph ph-microphone-slash"></i>
         </button>
         <button class="control-btn screen" id="toggleScreen" title="Compartir Pantalla">
-          <i class="ph ph-monitor"></i>
+          <i class="ph ph-monitor-play"></i>
         </button>
         <button class="control-btn end-call" id="endCallBtn" title="Terminar Llamada">
-          <i class="ph ph-phone-disconnect"></i>
+          <i class="ph ph-phone-slash"></i>
         </button>
       </div>
       
@@ -329,9 +358,6 @@
     const toggleMic = document.getElementById('toggleMic');
     const toggleScreen = document.getElementById('toggleScreen');
     const endCallBtn = document.getElementById('endCallBtn');
-    const debugBtn = document.getElementById('debugBtn');
-    const debugListBtn = document.getElementById('debugListBtn');
-    const debugGrupoBtn = document.getElementById('debugGrupoBtn');
 
     // Función para actualizar estado
     function updateStatus(message, type = 'warning') {
@@ -352,7 +378,10 @@
 
       try {
         signalRConnection = new signalR.HubConnectionBuilder()
-          .withUrl(`https://signalr2.onrender.com/chathub?userId=${userId}`)
+          <!-- .withUrl(`http://localhost:5127/chathub?userId=${userId}`) -->
+         .withUrl(`http://192.168.0.120:5127/chathub?userId=${userId}`)
+
+          <!-- .withUrl(`https://signalr2.onrender.com/chathub?userId=${userId}`) -->
           .configureLogging(signalR.LogLevel.Information)
           .build();
 
@@ -369,9 +398,14 @@
           updateStatus(`Error: ${mensaje}`, 'disconnected');
         });
 
-        signalRConnection.on("UsuarioUnidoASala", (salaId, userId, ofertaSDP) => {
-          console.log(`Usuario ${userId} se unió a la sala ${salaId}`);
-          handleUserJoined(userId, ofertaSDP);
+        // CORREGIDO: Un solo evento para nuevo usuario
+        signalRConnection.on("NuevoUsuarioEnSala", async (salaId, userId) => {
+          console.log(`Nuevo usuario ${userId} se unió a la sala ${salaId}`);
+          if (userId !== localUserId) {
+            // Si no soy yo, enviar oferta al nuevo usuario
+            console.log(`🔄 Enviando oferta automática a ${userId} porque se unió a la sala`);
+            await enviarOfertaA(userId);
+          }
         });
 
         signalRConnection.on("ParticipanteExistente", (salaId, userId) => {
@@ -382,9 +416,14 @@
         signalRConnection.on("EnviarOfertasAExistentes", async (salaId, participantesIds) => {
           console.log(`Debo enviar ofertas a: ${participantesIds.join(', ')}`);
           for (const participanteId of participantesIds) {
-            await enviarOfertaA(participanteId);
+            if (participanteId !== localUserId) {
+              console.log(`🔄 Enviando oferta automática a participante existente ${participanteId}`);
+              await enviarOfertaA(participanteId);
+            }
           }
         });
+
+        // ELIMINADO: Evento duplicado que causaba conflictos
 
         signalRConnection.on("ListaParticipantes", (salaId, participantes) => {
           console.log(`Lista de participantes en sala ${salaId}:`, participantes);
@@ -393,7 +432,9 @@
         });
 
         signalRConnection.on("RecibirOfertaSala", (salaId, userId, ofertaSDP) => {
-          console.log(`Recibida oferta de ${userId} en sala ${salaId}`);
+          console.log(`📥 Recibida oferta de ${userId} en sala ${salaId}`);
+          console.log(`📋 Oferta SDP recibida:`, ofertaSDP);
+          console.log(`🔍 Estado actual - localStream: ${!!localStream}, salaId: ${salaId}, localUserId: ${localUserId}`);
           handleOffer(userId, ofertaSDP);
         });
 
@@ -417,16 +458,32 @@
           leaveRoom();
         });
 
-        signalRConnection.on("DebugRecibirMensaje", (remitenteId, mensaje) => {
-          console.log(`🐛 Debug: Recibido mensaje de ${remitenteId}: ${mensaje}`);
+        signalRConnection.on("ForzarOfertaA", async (salaId, userId) => {
+          console.log(`🔄 Recibida notificación para enviar oferta a ${userId} en sala ${salaId}`);
+          if (userId !== localUserId) {
+            console.log(`📤 Enviando oferta automática a ${userId} por solicitud del servidor`);
+            await enviarOfertaA(userId);
+          }
         });
 
-        signalRConnection.on("DebugListaUsuarios", (mensaje) => {
-          console.log(`🔍 Debug: ${mensaje}`);
-        });
-
-        signalRConnection.on("DebugRecibirMensajeGrupo", (remitenteId, mensaje) => {
-          console.log(`🐛 Debug Grupo: Recibido mensaje de ${remitenteId}: ${mensaje}`);
+        signalRConnection.on("CambioEstadoParticipante", (salaId, userId, tipo, estado) => {
+          console.log(`📢 Usuario ${userId} cambió ${tipo} a ${estado ? 'activado' : 'desactivado'}`);
+          
+          // Actualizar la lista de participantes para mostrar el estado
+          const participante = participants.get(userId);
+          if (participante) {
+            // Aquí podrías actualizar la UI para mostrar el estado del participante
+            console.log(`👤 Estado actualizado para ${userId}: ${tipo} = ${estado}`);
+          }
+          
+          // Mostrar notificación temporal
+          const estadoTexto = estado ? 'activó' : 'desactivó';
+          updateStatus(`Usuario ${userId} ${estadoTexto} ${tipo}`, 'warning');
+          
+          // Limpiar la notificación después de 3 segundos
+          setTimeout(() => {
+            updateStatus(`En sala: ${salaId}`, 'connected');
+          }, 3000);
         });
 
         await signalRConnection.start();
@@ -504,14 +561,30 @@
         localVideoElement.srcObject = localStream;
         localVideoElement.muted = true; // Silenciar audio local
 
-        // Mostrar sala
-        setupPanel.style.display = 'none';
+        // Mostrar sala y ocultar solo los inputs, no los botones
+        const inputGroups = setupPanel.querySelectorAll('.input-group');
+        inputGroups.forEach(group => group.style.display = 'none');
         videoRoom.classList.add('active');
+        
+        // Mostrar botón de debug de ofertas
+        const debugOfertasBtn = document.getElementById('debugOfertasBtn');
+        if (debugOfertasBtn) {
+          debugOfertasBtn.style.display = 'inline-block';
+        }
         
         updateStatus(`En sala: ${salaId}`, 'connected');
 
-        // Obtener lista de participantes
+        // Inicializar iconos de controles
+        initializeControlIcons();
+
+        // Obtener lista de participantes y enviar ofertas automáticamente
         await signalRConnection.invoke("ObtenerParticipantesSala", salaId);
+        
+        // Enviar ofertas a todos los participantes existentes después de un breve delay
+        setTimeout(async () => {
+          console.log(`🔄 Enviando ofertas automáticas a participantes existentes en sala ${salaId}`);
+          await signalRConnection.invoke("SolicitarOfertasAExistentes", salaId);
+        }, 1000);
         
       } catch (err) {
         console.error('Error obteniendo medios:', err);
@@ -553,6 +626,9 @@
               pc: pc
             });
             updateParticipantsList();
+            
+            // Asegurar que el video se reproduzca
+            videoElement.play().catch(e => console.log('Auto-play falló:', e));
           }
         } else {
           console.warn(`⚠️ No hay streams en el evento ontrack de ${userId}`);
@@ -604,11 +680,15 @@
       container.appendChild(nameDiv);
       videoGrid.appendChild(container);
 
+      // Asegurar que el video se muestre inmediatamente
+      video.style.display = 'block';
+      container.style.display = 'block';
+
       return video;
     }
 
-    // Manejar usuario unido
-    async function handleUserJoined(userId, ofertaSDP) {
+    // Manejar usuario unido (ya no se usa directamente)
+    async function handleUserJoined(userId) {
       console.log(`Nuevo usuario ${userId} se unió, enviando oferta`);
       await enviarOfertaA(userId);
     }
@@ -616,35 +696,77 @@
     // Manejar oferta
     async function handleOffer(userId, ofertaSDP) {
       console.log(`📥 Recibida oferta de ${userId}, procesando...`);
+      console.log(`📋 Oferta SDP:`, ofertaSDP);
+      
+      // Verificar que tenemos stream local
+      if (!localStream) {
+        console.error(`❌ No hay stream local disponible para procesar oferta`);
+        return;
+      }
+      
       let pc = peerConnections.get(userId);
       if (!pc) {
         console.log(`📡 Creando nueva conexión peer para ${userId} (desde handleOffer)`);
         pc = createPeerConnection(userId);
         peerConnections.set(userId, pc);
-
-        if (localStream) {
-          console.log(`🎥 Agregando tracks locales a la conexión con ${userId} (desde handleOffer)`);
-          localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-        } else {
-          console.warn(`⚠️ No hay localStream disponible para ${userId} (desde handleOffer)`);
-        }
       }
 
       try {
+        // Verificar el estado actual de la conexión
+        console.log(`🔍 Estado actual de conexión con ${userId}:`, pc.signalingState);
+        
+        // Si la conexión ya tiene una descripción local, no podemos crear una respuesta
+        if (pc.signalingState !== 'stable' && pc.localDescription) {
+          console.warn(`⚠️ Conexión con ${userId} no está en estado estable, ignorando oferta`);
+          return;
+        }
+
+        // Agregar tracks locales si no se han agregado aún
+        if (pc.getSenders().length === 0) {
+          console.log(`🎥 Agregando tracks locales a la conexión con ${userId} (desde handleOffer)`);
+          localStream.getTracks().forEach(track => {
+            console.log(`🎬 Agregando track: ${track.kind} - enabled: ${track.enabled}`);
+            pc.addTrack(track, localStream);
+          });
+        }
+
         console.log(`🔄 Estableciendo descripción remota para ${userId}`);
-        await pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(ofertaSDP)));
+        const remoteDesc = new RTCSessionDescription(JSON.parse(ofertaSDP));
+        console.log(`📋 Descripción remota:`, remoteDesc);
+        await pc.setRemoteDescription(remoteDesc);
         console.log(`✅ Descripción remota establecida para ${userId}`);
         
-        console.log(`🔄 Creando respuesta para ${userId}`);
-        const respuesta = await pc.createAnswer();
-        await pc.setLocalDescription(respuesta);
-        console.log(`✅ Respuesta creada y establecida para ${userId}`);
+        // Procesar candidatos ICE pendientes si los hay
+        if (pc.pendingCandidates && pc.pendingCandidates.length > 0) {
+          console.log(`🔄 Procesando ${pc.pendingCandidates.length} candidatos ICE pendientes para ${userId}`);
+          for (const candidate of pc.pendingCandidates) {
+            try {
+              await pc.addIceCandidate(candidate);
+              console.log(`✅ Candidato ICE pendiente agregado para ${userId}`);
+            } catch (err) {
+              console.error(`❌ Error agregando candidato ICE pendiente:`, err);
+            }
+          }
+          pc.pendingCandidates = [];
+        }
+        
+        // Verificar que ahora podemos crear una respuesta
+        if (pc.signalingState === 'have-remote-offer') {
+          console.log(`🔄 Creando respuesta para ${userId}`);
+          const respuesta = await pc.createAnswer();
+          console.log(`📋 Respuesta creada:`, respuesta);
+          await pc.setLocalDescription(respuesta);
+          console.log(`✅ Respuesta creada y establecida para ${userId}`);
 
-        console.log(`📤 Enviando respuesta a ${userId}`);
-        signalRConnection.invoke("EnviarRespuestaSala", salaId, userId, JSON.stringify(respuesta));
-        console.log(`✅ Respuesta enviada a ${userId}`);
+          console.log(`📤 Enviando respuesta a ${userId}`);
+          await signalRConnection.invoke("EnviarRespuestaSala", salaId, userId, JSON.stringify(respuesta));
+          console.log(`✅ Respuesta enviada a ${userId}`);
+        } else {
+          console.warn(`⚠️ Estado de señalización incorrecto para crear respuesta: ${pc.signalingState}`);
+        }
       } catch (err) {
         console.error(`❌ Error procesando oferta de ${userId}:`, err);
+        updateStatus(`Error procesando oferta: ${err.message}`, 'disconnected');
       }
     }
 
@@ -657,6 +779,20 @@
           console.log(`🔄 Estableciendo descripción remota (respuesta) para ${userId}`);
           await pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(respuestaSDP)));
           console.log(`✅ Respuesta procesada correctamente para ${userId}`);
+          
+          // Procesar candidatos ICE pendientes si los hay
+          if (pc.pendingCandidates && pc.pendingCandidates.length > 0) {
+            console.log(`🔄 Procesando ${pc.pendingCandidates.length} candidatos ICE pendientes para ${userId}`);
+            for (const candidate of pc.pendingCandidates) {
+              try {
+                await pc.addIceCandidate(candidate);
+                console.log(`✅ Candidato ICE pendiente agregado para ${userId}`);
+              } catch (err) {
+                console.error(`❌ Error agregando candidato ICE pendiente:`, err);
+              }
+            }
+            pc.pendingCandidates = [];
+          }
         } catch (err) {
           console.error(`❌ Error procesando respuesta de ${userId}:`, err);
         }
@@ -669,8 +805,18 @@
     async function handleIceCandidate(userId, candidato) {
       console.log(`🧊 Recibido candidato ICE de ${userId}`);
       const pc = peerConnections.get(userId);
-      if (pc && pc.remoteDescription) {
+      if (pc) {
         try {
+          // Si no hay descripción remota aún, guardar el candidato para más tarde
+          if (!pc.remoteDescription) {
+            console.log(`⏳ Descripción remota no lista para ${userId}, guardando candidato ICE`);
+            if (!pc.pendingCandidates) {
+              pc.pendingCandidates = [];
+            }
+            pc.pendingCandidates.push(new RTCIceCandidate(JSON.parse(candidato)));
+            return;
+          }
+
           await pc.addIceCandidate(new RTCIceCandidate(JSON.parse(candidato)));
           console.log(`✅ Candidato ICE agregado para ${userId}`);
         } catch (err) {
@@ -685,37 +831,107 @@
     async function enviarOfertaA(userId) {
       try {
         console.log(`🔄 Enviando oferta a ${userId}...`);
+        
+        // Verificar que tenemos conexión y stream local
+        if (!signalRConnection || signalRConnection.state !== "Connected") {
+          console.error(`❌ No hay conexión SignalR activa`);
+          return;
+        }
+        
+        if (!localStream) {
+          console.error(`❌ No hay stream local disponible`);
+          return;
+        }
+
+        if (!salaId) {
+          console.error(`❌ No hay salaId definido`);
+          return;
+        }
+
+        console.log(`✅ Validaciones pasadas - salaId: ${salaId}, userId: ${userId}`);
+
         let pc = peerConnections.get(userId);
         if (!pc) {
           console.log(`📡 Creando nueva conexión peer para ${userId}`);
           pc = createPeerConnection(userId);
           peerConnections.set(userId, pc);
+        }
 
-          if (localStream) {
-            console.log(`🎥 Agregando tracks locales a la conexión con ${userId}`);
-            localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-          } else {
-            console.warn(`⚠️ No hay localStream disponible para ${userId}`);
+        // Verificar el estado de la conexión
+        console.log(`🔍 Estado actual de conexión con ${userId}:`, pc.signalingState);
+        
+        // Si la conexión no está en estado estable, esperar un poco
+        if (pc.signalingState !== 'stable') {
+          console.warn(`⚠️ Conexión con ${userId} no está en estado estable (${pc.signalingState}), esperando...`);
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          // Si aún no está estable, crear una nueva conexión
+          if (pc.signalingState !== 'stable') {
+            console.log(`🔄 Creando nueva conexión peer para ${userId} (reemplazando conexión inestable)`);
+            pc.close();
+            pc = createPeerConnection(userId);
+            peerConnections.set(userId, pc);
           }
         }
 
-        const oferta = await pc.createOffer();
-        await pc.setLocalDescription(oferta);
+        // Agregar tracks locales si no se han agregado aún
+        if (pc.getSenders().length === 0) {
+          console.log(`🎥 Agregando tracks locales a la conexión con ${userId}`);
+          localStream.getTracks().forEach(track => {
+            console.log(`🎬 Agregando track: ${track.kind} - enabled: ${track.enabled}`);
+            pc.addTrack(track, localStream);
+          });
+        }
 
-        console.log(`📤 Invocando EnviarOfertaSala para ${userId}`);
-        signalRConnection.invoke("EnviarOfertaSala", salaId, userId, JSON.stringify(oferta));
+        console.log(`🔄 Creando oferta para ${userId}...`);
+        const oferta = await pc.createOffer();
+        console.log(`✅ Oferta creada:`, oferta);
+        
+        await pc.setLocalDescription(oferta);
+        console.log(`✅ Descripción local establecida`);
+
+        console.log(`📤 Invocando EnviarOfertaSala para ${userId} en sala ${salaId}`);
+        await signalRConnection.invoke("EnviarOfertaSala", salaId, userId, JSON.stringify(oferta));
         console.log(`✅ Oferta enviada a ${userId}`);
+        
+        // Agregar un timeout para verificar si se recibió respuesta
+        setTimeout(() => {
+          if (pc.signalingState !== 'stable') {
+            console.warn(`⚠️ Timeout: La conexión con ${userId} no se estableció correctamente`);
+            
+            // Reintentar la oferta después de un delay
+            setTimeout(async () => {
+              console.log(`🔄 Reintentando oferta para ${userId}...`);
+              try {
+                await enviarOfertaA(userId);
+              } catch (retryErr) {
+                console.error(`❌ Error en reintento para ${userId}:`, retryErr);
+              }
+            }, 2000);
+          }
+        }, 10000);
+        
       } catch (err) {
         console.error(`❌ Error enviando oferta a ${userId}:`, err);
+        updateStatus(`Error enviando oferta: ${err.message}`, 'disconnected');
       }
     }
 
     // Remover participante
     function removeParticipant(userId) {
+      console.log(`🗑️ Removiendo participante ${userId}`);
+      
       const pc = peerConnections.get(userId);
       if (pc) {
+        // Limpiar candidatos pendientes
+        if (pc.pendingCandidates) {
+          pc.pendingCandidates = [];
+        }
+        
+        // Cerrar la conexión
         pc.close();
         peerConnections.delete(userId);
+        console.log(`✅ Conexión peer cerrada para ${userId}`);
       }
 
       const participante = participants.get(userId);
@@ -723,10 +939,12 @@
         const container = participante.videoElement.parentElement;
         if (container) {
           container.remove();
+          console.log(`✅ Video removido para ${userId}`);
         }
       }
       participants.delete(userId);
       updateParticipantsList();
+      console.log(`✅ Participante ${userId} removido completamente`);
     }
 
     // Salir de la sala
@@ -743,14 +961,28 @@
         localStream = null;
       }
 
+      // Detener compartición de pantalla si está activa
+      if (screenStream) {
+        screenStream.getTracks().forEach(track => track.stop());
+        screenStream = null;
+        isScreenSharing = false;
+      }
+
       // Limpiar videos
       videoGrid.innerHTML = '';
       participants.clear();
       updateParticipantsList();
 
-      // Mostrar panel de configuración
+      // Ocultar sala y restaurar inputs
       videoRoom.classList.remove('active');
-      setupPanel.style.display = 'block';
+      const inputGroups = setupPanel.querySelectorAll('.input-group');
+      inputGroups.forEach(group => group.style.display = 'block');
+      
+      // Ocultar botón de debug de ofertas
+      const debugOfertasBtn = document.getElementById('debugOfertasBtn');
+      if (debugOfertasBtn) {
+        debugOfertasBtn.style.display = 'none';
+      }
       
       updateStatus('Desconectado de la sala', 'disconnected');
     }
@@ -762,9 +994,21 @@
       // Agregar participante local
       const localItem = document.createElement('div');
       localItem.className = 'participant-item';
+      
+      // Obtener estado de cámara y micrófono local
+      const videoTrack = localStream?.getVideoTracks()[0];
+      const audioTrack = localStream?.getAudioTracks()[0];
+      const cameraEnabled = videoTrack?.enabled ?? false;
+      const micEnabled = audioTrack?.enabled ?? false;
+      
       localItem.innerHTML = `
         <div class="status-indicator"></div>
         <span>Tú (${localUserId})</span>
+        <div class="participant-controls">
+          <i class="ph ph-camera ${cameraEnabled ? 'active' : 'muted'}" title="Cámara ${cameraEnabled ? 'activada' : 'desactivada'}"></i>
+          <i class="ph ph-microphone ${micEnabled ? 'active' : 'muted'}" title="Micrófono ${micEnabled ? 'activado' : 'silenciado'}"></i>
+          ${isScreenSharing ? '<i class="ph ph-monitor active" title="Compartiendo pantalla"></i>' : ''}
+        </div>
       `;
       participantsContainer.appendChild(localItem);
 
@@ -775,6 +1019,10 @@
         item.innerHTML = `
           <div class="status-indicator"></div>
           <span>${participante.name}</span>
+          <div class="participant-controls">
+            <i class="ph ph-camera" title="Cámara"></i>
+            <i class="ph ph-microphone" title="Micrófono"></i>
+          </div>
         `;
         participantsContainer.appendChild(item);
       }
@@ -796,19 +1044,34 @@
 
       // Agregar participantes del servidor (excluyendo al usuario local)
       const participantesUnicos = new Set();
-      participantes.forEach(participante => {
-        if (participante.UsuarioId !== localUserId && !participantesUnicos.has(participante.UsuarioId)) {
-          participantesUnicos.add(participante.UsuarioId);
-          const item = document.createElement('div');
-          item.className = 'participant-item';
-          item.innerHTML = `
-            <div class="status-indicator"></div>
-            <span>Usuario ${participante.UsuarioId}</span>
-          `;
-          participantsContainer.appendChild(item);
-          console.log(`👤 Agregado participante: ${participante.UsuarioId}`);
-        }
-      });
+      
+      if (Array.isArray(participantes)) {
+        participantes.forEach(participante => {
+          // Verificar que participante y UsuarioId existan
+          if (participante && participante.UsuarioId && 
+              participante.UsuarioId !== localUserId && 
+              !participantesUnicos.has(participante.UsuarioId)) {
+            
+            participantesUnicos.add(participante.UsuarioId);
+            const item = document.createElement('div');
+            item.className = 'participant-item';
+            item.innerHTML = `
+              <div class="status-indicator"></div>
+              <span>Usuario ${participante.UsuarioId}</span>
+            `;
+            participantsContainer.appendChild(item);
+            console.log(`👤 Agregado participante: ${participante.UsuarioId}`);
+            
+            // Enviar oferta automáticamente al nuevo participante detectado
+            setTimeout(async () => {
+              console.log(`🔄 Enviando oferta automática a ${participante.UsuarioId} detectado en lista`);
+              await enviarOfertaA(participante.UsuarioId);
+            }, 500);
+          }
+        });
+      } else {
+        console.warn('⚠️ participantes no es un array:', participantes);
+      }
       
       console.log(`📊 Total participantes en lista: ${participantesUnicos.size + 1} (incluyendo local)`);
     }
@@ -817,50 +1080,24 @@
     connectBtn.addEventListener('click', connectToSignalR);
     createSalaBtn.addEventListener('click', createSala);
     joinSalaBtn.addEventListener('click', joinSala);
-    debugBtn.addEventListener('click', debugComunicacion);
-    debugListBtn.addEventListener('click', debugListaParticipantes);
-    debugGrupoBtn.addEventListener('click', debugGrupo);
 
-    // Función de debug para probar comunicación
-    async function debugComunicacion() {
-      const otroUserId = prompt('Ingresa el ID del otro usuario para probar comunicación:');
-      if (otroUserId && signalRConnection && signalRConnection.state === "Connected") {
-        try {
-          await signalRConnection.invoke("DebugEnviarMensaje", otroUserId, `Hola desde ${localUserId} a las ${new Date().toLocaleTimeString()}`);
-          console.log(`🐛 Debug: Mensaje enviado a ${otroUserId}`);
-        } catch (err) {
-          console.error('Error en debug:', err);
+    // Botón de debug para forzar ofertas
+    const debugOfertasBtn = document.getElementById('debugOfertasBtn');
+    if (debugOfertasBtn) {
+      debugOfertasBtn.addEventListener('click', async () => {
+        if (signalRConnection && signalRConnection.state === "Connected" && salaId) {
+          try {
+            console.log(`🔄 Forzando envío de ofertas en sala ${salaId}`);
+            await signalRConnection.invoke("SolicitarOfertasAExistentes", salaId);
+            updateStatus(`Forzando envío de ofertas en sala ${salaId}`, 'warning');
+          } catch (err) {
+            console.error('Error forzando envío de ofertas:', err);
+            updateStatus(`Error forzando envío de ofertas: ${err.message}`, 'disconnected');
+          }
+        } else {
+          alert('Primero debes conectarte y estar en una sala.');
         }
-      }
-    }
-
-    // Función de debug para probar la lista de participantes
-    async function debugListaParticipantes() {
-      if (signalRConnection && signalRConnection.state === "Connected") {
-        try {
-          const participantes = await signalRConnection.invoke("ObtenerParticipantesSala", salaId);
-          console.log(`👥 Lista de participantes en sala ${salaId}:`, participantes);
-          updateParticipantsList(participantes); // Actualizar la lista en la UI
-        } catch (err) {
-          console.error('Error en debug de lista:', err);
-        }
-      } else {
-        alert('Primero debes conectarte y estar en una sala.');
-      }
-    }
-
-    // Función de debug para probar la comunicación de grupo
-    async function debugGrupo() {
-      if (signalRConnection && signalRConnection.state === "Connected" && salaId) {
-        try {
-          await signalRConnection.invoke("DebugEnviarAGrupo", salaId, `Hola desde ${localUserId} a todos!`);
-          console.log(`👥 Debug Grupo: Mensaje enviado a todos en sala ${salaId}`);
-        } catch (err) {
-          console.error('Error en debug de grupo:', err);
-        }
-      } else {
-        alert('Primero debes conectarte y estar en una sala.');
-      }
+      });
     }
 
     // Evento para cuando se cierra la página
@@ -876,6 +1113,24 @@
         if (videoTrack) {
           videoTrack.enabled = !videoTrack.enabled;
           toggleCamera.classList.toggle('muted', !videoTrack.enabled);
+          
+          // Cambiar el icono según el estado
+          const cameraIcon = toggleCamera.querySelector('i');
+          if (videoTrack.enabled) {
+            cameraIcon.className = 'ph ph-camera';
+          } else {
+            cameraIcon.className = 'ph ph-camera-slash';
+          }
+          
+          // Notificar a otros participantes sobre el cambio de estado
+          if (signalRConnection && signalRConnection.state === "Connected" && salaId) {
+            signalRConnection.invoke("NotificarCambioEstado", salaId, localUserId, "camera", videoTrack.enabled);
+          }
+          
+          updateStatus(`Cámara ${videoTrack.enabled ? 'activada' : 'desactivada'}`, 'connected');
+          
+          // Actualizar lista de participantes
+          updateParticipantsList();
         }
       }
     });
@@ -886,11 +1141,148 @@
         if (audioTrack) {
           audioTrack.enabled = !audioTrack.enabled;
           toggleMic.classList.toggle('muted', !audioTrack.enabled);
+          
+          // Cambiar el icono según el estado
+          const micIcon = toggleMic.querySelector('i');
+          if (audioTrack.enabled) {
+            micIcon.className = 'ph ph-microphone';
+          } else {
+            micIcon.className = 'ph ph-microphone-slash';
+          }
+          
+          // Notificar a otros participantes sobre el cambio de estado
+          if (signalRConnection && signalRConnection.state === "Connected" && salaId) {
+            signalRConnection.invoke("NotificarCambioEstado", salaId, localUserId, "mic", audioTrack.enabled);
+          }
+          
+          updateStatus(`Micrófono ${audioTrack.enabled ? 'activado' : 'silenciado'}`, 'connected');
+          
+          // Actualizar lista de participantes
+          updateParticipantsList();
         }
       }
     });
 
+    toggleScreen.addEventListener('click', async () => {
+      try {
+        if (!isScreenSharing) {
+          // Iniciar compartir pantalla
+          screenStream = await navigator.mediaDevices.getDisplayMedia({ 
+            video: { 
+              cursor: "always" 
+            }, 
+            audio: false 
+          });
+          
+          // Reemplazar el video track en el stream local
+          const videoTrack = screenStream.getVideoTracks()[0];
+          const localVideoTrack = localStream.getVideoTracks()[0];
+          
+          if (videoTrack && localVideoTrack) {
+            // Reemplazar el track en todas las conexiones peer
+            for (const [userId, pc] of peerConnections) {
+              const sender = pc.getSenders().find(s => s.track?.kind === 'video');
+              if (sender) {
+                sender.replaceTrack(videoTrack);
+              }
+            }
+            
+            // Actualizar el video local
+            localVideoElement.srcObject = screenStream;
+            
+            isScreenSharing = true;
+            toggleScreen.classList.add('active');
+            
+            // Cambiar el icono cuando está compartiendo
+            const screenIcon = toggleScreen.querySelector('i');
+            screenIcon.className = 'ph ph-monitor-stop';
+            
+            updateStatus('Compartiendo pantalla', 'connected');
+            
+            // Notificar a otros participantes
+            if (signalRConnection && signalRConnection.state === "Connected" && salaId) {
+              signalRConnection.invoke("NotificarCambioEstado", salaId, localUserId, "screen", true);
+            }
+            
+            // Actualizar lista de participantes
+            updateParticipantsList();
+          }
+          
+          // Manejar cuando el usuario detiene la compartición
+          videoTrack.onended = () => {
+            stopScreenSharing();
+          };
+          
+        } else {
+          // Detener compartir pantalla
+          stopScreenSharing();
+        }
+      } catch (err) {
+        console.error('Error compartiendo pantalla:', err);
+        updateStatus('Error compartiendo pantalla: ' + err.message, 'disconnected');
+      }
+    });
+
+    // Función para detener compartir pantalla
+    function stopScreenSharing() {
+      if (screenStream) {
+        screenStream.getTracks().forEach(track => track.stop());
+        screenStream = null;
+      }
+      
+      // Restaurar el video track original
+      const originalVideoTrack = localStream.getVideoTracks()[0];
+      if (originalVideoTrack) {
+        // Reemplazar el track en todas las conexiones peer
+        for (const [userId, pc] of peerConnections) {
+          const sender = pc.getSenders().find(s => s.track?.kind === 'video');
+          if (sender) {
+            sender.replaceTrack(originalVideoTrack);
+          }
+        }
+        
+        // Restaurar el video local
+        localVideoElement.srcObject = localStream;
+      }
+      
+      isScreenSharing = false;
+      toggleScreen.classList.remove('active');
+      
+      // Restaurar el icono cuando no está compartiendo
+      const screenIcon = toggleScreen.querySelector('i');
+      screenIcon.className = 'ph ph-monitor-play';
+      
+      updateStatus('Pantalla compartida detenida', 'connected');
+      
+      // Notificar a otros participantes
+      if (signalRConnection && signalRConnection.state === "Connected" && salaId) {
+        signalRConnection.invoke("NotificarCambioEstado", salaId, localUserId, "screen", false);
+      }
+      
+      // Actualizar lista de participantes
+      updateParticipantsList();
+    }
+
     endCallBtn.addEventListener('click', leaveRoom);
+
+    // Función para inicializar iconos de controles
+    function initializeControlIcons() {
+      // Inicializar icono de cámara (por defecto activada)
+      const cameraIcon = toggleCamera.querySelector('i');
+      cameraIcon.className = 'ph ph-camera';
+      
+      // Inicializar icono de micrófono (por defecto activado)
+      const micIcon = toggleMic.querySelector('i');
+      micIcon.className = 'ph ph-microphone';
+      
+      // Inicializar icono de pantalla (por defecto no compartiendo)
+      const screenIcon = toggleScreen.querySelector('i');
+      screenIcon.className = 'ph ph-monitor-play';
+      
+      // Inicializar icono de terminar llamada
+      const endCallIcon = endCallBtn.querySelector('i');
+      endCallIcon.className = 'ph ph-phone-slash';
+    }
 
     // Inicialización
     console.log('Sala de videollamada manual cargada');

@@ -136,6 +136,10 @@ namespace SignalR.Hubs
                 {
                     // Guardar el userId en el contexto para uso posterior
                     Context.Items["userId"] = userId;
+                    
+                    // Agregar al usuario a su grupo personal para mensajes directos
+                    await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{userId}");
+                    Console.WriteLine($"✅ Usuario {userId} agregado a su grupo personal: user_{userId}");
                 }
 
                 await base.OnConnectedAsync();
@@ -152,7 +156,7 @@ namespace SignalR.Hubs
             try
             {
                 var httpContext = Context.GetHttpContext();
-                var userIdString = httpContext.Request.Query["userId"];
+                var userIdString = httpContext?.Request.Query["userId"].ToString();
 
                 if (!string.IsNullOrEmpty(userIdString))
                 {
@@ -176,7 +180,7 @@ namespace SignalR.Hubs
                         else
                         {
                             // Notificar a otros participantes
-                            await Clients.OthersInGroup($"sala_{participacion.LlamadaGrupal.GrupoId}")
+                            await Clients.OthersInGroup($"grupo_{participacion.LlamadaGrupal.GrupoId}")
                                 .SendAsync("UsuarioSalioDeSala", participacion.LlamadaGrupal.GrupoId.ToString(), userIdString);
                         }
                     }
@@ -186,10 +190,10 @@ namespace SignalR.Hubs
                         await _context.SaveChangesAsync();
                     }
 
-                    // Remover de grupos de SignalR
+                    // Remover de grupos de SignalR usando formato consistente
                     var grupos = await _context.ParticipantesLlamada
                         .Where(p => p.UsuarioId == userIdString && p.Activo == false)
-                        .Select(p => $"sala_{p.LlamadaGrupal.GrupoId}")
+                        .Select(p => $"grupo_{p.LlamadaGrupal.GrupoId}")
                         .Distinct()
                         .ToListAsync();
 
@@ -376,11 +380,11 @@ namespace SignalR.Hubs
                 _context.ParticipantesLlamada.Add(participante);
                 await _context.SaveChangesAsync();
 
-                // Unirse al grupo de SignalR
-                await Groups.AddToGroupAsync(Context.ConnectionId, $"sala_{salaIdInt}");
+                // Unirse al grupo de SignalR usando el formato consistente
+                await Groups.AddToGroupAsync(Context.ConnectionId, $"grupo_{salaIdInt}");
                 
-                // Notificar a todos en la sala
-                await Clients.Group($"sala_{salaIdInt}")
+                // Notificar a todos en la sala usando el formato consistente
+                await Clients.Group($"grupo_{salaIdInt}")
                     .SendAsync("SalaCreada", salaIdInt.ToString(), creadorId);
                 
                 Console.WriteLine($"Sala {salaIdInt} creada por {creadorId}");
@@ -458,11 +462,11 @@ namespace SignalR.Hubs
                     await _context.SaveChangesAsync();
                 }
 
-                // Unirse al grupo de SignalR
-                await Groups.AddToGroupAsync(Context.ConnectionId, $"sala_{salaIdInt}");
+                // Unirse al grupo de SignalR usando formato consistente
+                await Groups.AddToGroupAsync(Context.ConnectionId, $"grupo_{salaIdInt}");
 
                 // Notificar a otros participantes que hay un nuevo usuario (sin oferta)
-                await Clients.OthersInGroup($"sala_{salaIdInt}")
+                await Clients.OthersInGroup($"grupo_{salaIdInt}")
                     .SendAsync("NuevoUsuarioEnSala", salaIdInt.ToString(), userId);
 
                 // Enviar lista de participantes existentes al nuevo usuario
@@ -521,18 +525,18 @@ namespace SignalR.Hubs
                         participante.LlamadaGrupal.FechaFin = DateTime.UtcNow;
                         await _context.SaveChangesAsync();
 
-                        await Clients.Group($"sala_{salaIdInt}")
+                        await Clients.Group($"grupo_{salaIdInt}")
                             .SendAsync("SalaEliminada", salaIdInt.ToString());
                     }
                     else
                     {
-                        await Clients.OthersInGroup($"sala_{salaIdInt}")
+                        await Clients.OthersInGroup($"grupo_{salaIdInt}")
                             .SendAsync("UsuarioSalioDeSala", salaIdInt.ToString(), userId);
                     }
                 }
 
-                // Salir del grupo de SignalR
-                await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"sala_{salaIdInt}");
+                // Salir del grupo de SignalR usando formato consistente
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"grupo_{salaIdInt}");
                 
                 Console.WriteLine($"Usuario {userId} salió de la sala {salaIdInt}");
             }
@@ -548,9 +552,31 @@ namespace SignalR.Hubs
             Console.WriteLine($"🔑 Context.UserIdentifier: '{Context.UserIdentifier}'");
             Console.WriteLine($"🎯 Destinatario: '{destinatarioId}'");
             
-            // Enviar solo al destinatario específico, no a todo el grupo
-            await Clients.User(destinatarioId).SendAsync("RecibirOfertaSala", salaId, Context.UserIdentifier, ofertaSDP);
-            Console.WriteLine($"✅ Oferta enviada de {Context.UserIdentifier} a {destinatarioId}");
+            try
+            {
+                // Verificar si el destinatario está conectado
+                var httpContext = Context.GetHttpContext();
+                Console.WriteLine($"🌐 HttpContext disponible: {httpContext != null}");
+                
+                // Enviar solo al destinatario específico, no a todo el grupo
+                await Clients.User(destinatarioId).SendAsync("RecibirOfertaSala", salaId, Context.UserIdentifier, ofertaSDP);
+                Console.WriteLine($"✅ Oferta enviada de {Context.UserIdentifier} a {destinatarioId}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error enviando oferta a {destinatarioId}: {ex.Message}");
+                // Intentar enviar al grupo como fallback
+                try
+                {
+                    Console.WriteLine($"🔄 Intentando enviar al grupo grupo_{salaId} como fallback");
+                    await Clients.Group($"grupo_{salaId}").SendAsync("RecibirOfertaSala", salaId, Context.UserIdentifier, ofertaSDP);
+                    Console.WriteLine($"✅ Oferta enviada al grupo como fallback");
+                }
+                catch (Exception ex2)
+                {
+                    Console.WriteLine($"❌ Error en fallback: {ex2.Message}");
+                }
+            }
         }
 
         public async Task EnviarRespuestaSala(string salaId, string destinatarioId, string respuestaSDP)
@@ -634,16 +660,194 @@ namespace SignalR.Hubs
         // Método de fallback para enviar a todo el grupo
         public async Task DebugEnviarAGrupo(string salaId, string mensaje)
         {
-            Console.WriteLine($"🐛 Debug Grupo: Enviando mensaje de {Context.UserIdentifier} a grupo sala_{salaId}: {mensaje}");
+            Console.WriteLine($"🐛 Debug Grupo: Enviando mensaje de {Context.UserIdentifier} a grupo grupo_{salaId}: {mensaje}");
             
             try
             {
-                await Clients.Group($"sala_{salaId}").SendAsync("DebugRecibirMensajeGrupo", Context.UserIdentifier, mensaje);
+                await Clients.Group($"grupo_{salaId}").SendAsync("DebugRecibirMensajeGrupo", Context.UserIdentifier, mensaje);
                 Console.WriteLine($"✅ Debug Grupo: Mensaje enviado exitosamente");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"❌ Debug Grupo: Error enviando mensaje: {ex.Message}");
+            }
+        }
+
+        // Método de debug específico para salas
+        public async Task DebugEnviarMensajeSala(string salaId, string mensaje)
+        {
+            Console.WriteLine($"🐛 Debug Sala: Enviando mensaje de {Context.UserIdentifier} a sala {salaId}: {mensaje}");
+            
+            try
+            {
+                await Clients.Group($"grupo_{salaId}").SendAsync("DebugRecibirMensajeSala", Context.UserIdentifier, mensaje);
+                Console.WriteLine($"✅ Debug Sala: Mensaje enviado exitosamente");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Debug Sala: Error enviando mensaje: {ex.Message}");
+            }
+        }
+
+        // Método para verificar si un usuario está conectado
+        public async Task VerificarUsuarioConectado(string userId)
+        {
+            Console.WriteLine($"🔍 Verificando si usuario {userId} está conectado");
+            Console.WriteLine($"🔑 Context.UserIdentifier: '{Context.UserIdentifier}'");
+            
+            try
+            {
+                // Intentar enviar un mensaje de prueba al usuario
+                await Clients.User(userId).SendAsync("DebugRecibirMensaje", Context.UserIdentifier, "Mensaje de prueba de conectividad");
+                Console.WriteLine($"✅ Usuario {userId} está conectado y recibió el mensaje");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Usuario {userId} no está conectado o no pudo recibir el mensaje: {ex.Message}");
+            }
+        }
+
+        // Método para forzar el envío de ofertas
+        public async Task ForzarEnvioOfertas(string salaId)
+        {
+            try
+            {
+                if (!int.TryParse(salaId, out int salaIdInt))
+                {
+                    Console.WriteLine($"❌ salaId '{salaId}' no es un número válido");
+                    return;
+                }
+
+                Console.WriteLine($"🔄 Forzando envío de ofertas en sala {salaId} por usuario {Context.UserIdentifier}");
+
+                // Obtener todos los participantes activos en la sala
+                var participantes = await _context.ParticipantesLlamada
+                    .Where(p => p.LlamadaGrupal.GrupoId == salaIdInt && p.Activo && p.UsuarioId != Context.UserIdentifier)
+                    .Select(p => p.UsuarioId)
+                    .ToListAsync();
+
+                Console.WriteLine($"📋 Participantes encontrados: {string.Join(", ", participantes)}");
+
+                // Notificar a todos los participantes que deben enviar ofertas
+                foreach (var participanteId in participantes)
+                {
+                    Console.WriteLine($"📤 Notificando a {participanteId} que debe enviar oferta a {Context.UserIdentifier}");
+                    await Clients.User(participanteId).SendAsync("ForzarOfertaA", salaId, Context.UserIdentifier);
+                }
+
+                Console.WriteLine($"✅ Notificaciones enviadas a {participantes.Count} participantes");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error forzando envío de ofertas: {ex.Message}");
+            }
+        }
+
+        // Método para verificar el estado de las conexiones peer
+        public async Task<object> VerificarConexionesPeer(string salaId)
+        {
+            try
+            {
+                if (!int.TryParse(salaId, out int salaIdInt))
+                {
+                    return new { error = "salaId no válido" };
+                }
+
+                Console.WriteLine($"🔍 Verificando conexiones peer en sala {salaId} para usuario {Context.UserIdentifier}");
+
+                // Obtener todos los participantes activos en la sala
+                var participantes = await _context.ParticipantesLlamada
+                    .Where(p => p.LlamadaGrupal.GrupoId == salaIdInt && p.Activo)
+                    .Select(p => new
+                    {
+                        UsuarioId = p.UsuarioId,
+                        FechaUnion = p.FechaUnion,
+                        Activo = p.Activo
+                    })
+                    .ToListAsync();
+
+                var resultado = new
+                {
+                    salaId = salaId,
+                    usuarioActual = Context.UserIdentifier,
+                    totalParticipantes = participantes.Count,
+                    participantes = participantes,
+                    timestamp = DateTime.UtcNow
+                };
+
+                Console.WriteLine($"📊 Estado de conexiones: {participantes.Count} participantes activos");
+                return resultado;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error verificando conexiones peer: {ex.Message}");
+                return new { error = ex.Message };
+            }
+        }
+
+        // Método para solicitar ofertas de participantes existentes
+        public async Task SolicitarOfertasAExistentes(string salaId)
+        {
+            try
+            {
+                if (!int.TryParse(salaId, out int salaIdInt))
+                {
+                    Console.WriteLine($"❌ salaId '{salaId}' no es un número válido");
+                    return;
+                }
+
+                Console.WriteLine($"🔄 Usuario {Context.UserIdentifier} solicita ofertas de participantes existentes en sala {salaId}");
+
+                // Obtener todos los participantes activos en la sala (excluyendo al solicitante)
+                var participantes = await _context.ParticipantesLlamada
+                    .Where(p => p.LlamadaGrupal.GrupoId == salaIdInt && p.Activo && p.UsuarioId != Context.UserIdentifier)
+                    .Select(p => p.UsuarioId)
+                    .ToListAsync();
+
+                if (participantes.Any())
+                {
+                    Console.WriteLine($"📋 Participantes existentes en sala {salaId}: {string.Join(", ", participantes)}");
+                    
+                    // Notificar a cada participante existente que debe enviar una oferta al nuevo usuario
+                    foreach (var participanteId in participantes)
+                    {
+                        try
+                        {
+                            await Clients.User(participanteId.ToString()).SendAsync("ForzarOfertaA", salaId, Context.UserIdentifier);
+                            Console.WriteLine($"✅ Notificación enviada a participante {participanteId} para enviar oferta a {Context.UserIdentifier}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"❌ Error notificando a participante {participanteId}: {ex.Message}");
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"ℹ️ No hay participantes existentes en sala {salaId}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error solicitando ofertas de participantes existentes: {ex.Message}");
+            }
+        }
+
+        // Método para notificar cambios de estado (cámara, micrófono, pantalla)
+        public async Task NotificarCambioEstado(string salaId, string userId, string tipo, bool estado)
+        {
+            try
+            {
+                Console.WriteLine($"📢 Usuario {userId} cambió estado de {tipo} a {(estado ? "activado" : "desactivado")} en sala {salaId}");
+                
+                // Notificar a todos los participantes en la sala (excepto al remitente)
+                await Clients.OthersInGroup($"grupo_{salaId}").SendAsync("CambioEstadoParticipante", salaId, userId, tipo, estado);
+                
+                Console.WriteLine($"✅ Notificación de cambio de estado enviada a sala {salaId}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error notificando cambio de estado: {ex.Message}");
             }
         }
     }
